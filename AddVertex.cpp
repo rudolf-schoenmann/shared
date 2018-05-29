@@ -1,5 +1,3 @@
-/*TEST*/
-/*TESTTEST*/
 /*
   File:        AddVertex.cpp
   Description: Add vertex dialog

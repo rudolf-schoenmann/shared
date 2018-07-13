@@ -1,20 +1,4 @@
-/*
-  File:        GLChartConst.h
-  Description: 2D 'scientific oriented' chart component (constant definitions)
-               C++ port of fr.esrf.tangoatk.widget.util.chart
-  Author:      J-L PONS (2007)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-*/
-
+// Copyright (c) 2011 rubicon IT GmbH
 #ifndef _GLCHARTCONSTH_
 #define _GLCHARTCONSTH_
 
@@ -249,12 +233,18 @@ typedef struct {
 
 } GLCPoint;
 
-typedef struct {
-
+class GLColor {
+public:
+	GLColor() {}
+	GLColor(int red, int green, int blue) {
+		r = red;
+		g = green;
+		b = blue;
+	}
   int r;
   int g;
   int b;
 
-} GLCColor;
+};
 
 #endif /* _GLCHARTCONSTH_ */

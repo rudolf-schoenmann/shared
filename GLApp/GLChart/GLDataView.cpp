@@ -1,20 +1,4 @@
-/*
-  File:        GLDataView.cpp
-  Description: 2D 'scientific oriented' chart component (Data views managenent)
-               C++ port of fr.esrf.tangoatk.widget.util.chart
-  Author:      J-L PONS (2007)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General License for more details.
-*/
-
+// Copyright (c) 2011 rubicon IT GmbH
 #include "GLChart.h"
 #include "../GLTypes.h"
 #include "../MathTools.h" //PI
@@ -163,7 +147,7 @@ int GLDataView::GetFillMethod() {
  * @param c Filling color
  * @see getFillColor
  */
-void GLDataView::SetFillColor(GLCColor c) {
+void GLDataView::SetFillColor(GLColor c) {
   fillColor = c;
 }
 
@@ -172,7 +156,7 @@ void GLDataView::SetFillColor(GLCColor c) {
  * @return Filling color
  * @see setFillColor
  */
-GLCColor GLDataView::GetFillColor() {
+GLColor GLDataView::GetFillColor() {
   return fillColor;
 }
 
@@ -183,7 +167,7 @@ GLCColor GLDataView::GetFillColor() {
  * @param c Curve color
  * @see getColor
  */
-void GLDataView::SetColor(GLCColor c) {
+void GLDataView::SetColor(GLColor c) {
   lineColor = c;
 }
 
@@ -192,7 +176,7 @@ void GLDataView::SetColor(GLCColor c) {
  * @return Curve color
  * @see setColor
  */
-GLCColor GLDataView::GetColor() {
+GLColor GLDataView::GetColor() {
   return lineColor;
 }
 
@@ -253,11 +237,11 @@ bool GLDataView::IsLabelVisible() {
   return labelVisible;
 }
 
-GLCColor GLDataView::GetLabelColor () {
+GLColor GLDataView::GetLabelColor () {
   return labelColor;
 }
 
-void GLDataView::SetLabelColor (GLCColor labelColor) {
+void GLDataView::SetLabelColor (GLColor labelColor) {
   this->labelColor = labelColor;
 }
 
@@ -475,7 +459,7 @@ int GLDataView::GetBarWidth() {
  * @param c Marker color
  * @see getMarkerColor
  */
-void GLDataView::SetMarkerColor(GLCColor c) {
+void GLDataView::SetMarkerColor(GLColor c) {
   markerColor = c;
 }
 
@@ -484,7 +468,7 @@ void GLDataView::SetMarkerColor(GLCColor c) {
  * @return Marker color
  * @see setMarkerColor
  */
-GLCColor GLDataView::GetMarkerColor() {
+GLColor GLDataView::GetMarkerColor() {
   return markerColor;
 }
 
@@ -552,7 +536,7 @@ void GLDataView::SetLineWidth(int c) {
  * @param s Name of this view
  * @see getName
  */
-void GLDataView::SetName(char *s) {
+void GLDataView::SetName(const char *s) {
   strcpy(name,s);
 }
 

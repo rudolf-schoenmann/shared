@@ -1,18 +1,4 @@
-/*
-  File:        GLGradient.cpp
-  Description: Button class (SDL/OpenGL OpenGL application framework)
-  Author:      J-L PONS (2007)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-*/
+// Copyright (c) 2011 rubicon IT GmbH
 #include "GLWindow.h"
 #include "GLGradient.h"
 #include "GLToolkit.h"
@@ -314,8 +300,7 @@ void GLGradient::Paint() {
   glTexCoord2f(0.0f,1.0f);glVertex2i(gPosX       ,gPosY+gHeight);
   glEnd();
 
-  GLCColor black;
-  black.r = 0;black.g = 0;black.b = 0;
+  GLColor black(0,0,0);
   axis->MeasureAxis(gWidth,0);
   axis->PaintAxisDirect(gPosX,gPosY+gHeight, black, 0, 0);
 

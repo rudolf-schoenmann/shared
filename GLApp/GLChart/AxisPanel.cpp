@@ -1,20 +1,4 @@
-/*
-  File:        AxisPanel.cpp
-  Description: 2D 'scientific oriented' chart component (Axis settings dialog)
-               C++ port of fr.esrf.tangoatk.widget.util.chart
-  Author:      J-L PONS (2007)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-*/
-
+// Copyright (c) 2011 rubicon IT GmbH
 #include "../GLChart/GLChart.h"
 #include "AxisPanel.h"
 #include "../GLMessageBox.h"
@@ -120,7 +104,7 @@ AxisPanel::AxisPanel(GLAxis *a,int axisType,GLChart *parentChart)  {
     ColorView = new GLLabel("");
     ColorView->SetOpaque(true);
     ColorView->SetBorder(BORDER_ETCHED);
-    GLCColor aColor = a->GetAxisColor();
+    GLColor aColor = a->GetAxisColor();
     ColorView->SetBackgroundColor(aColor.r,aColor.g,aColor.b);
     ColorBtn = new GLButton(0,"...");
 
@@ -216,8 +200,8 @@ void AxisPanel::ProcessMessage(GLComponent *src,int message) {
       if (!b) {
 
         double min,max;
-        sscanf(MinText->GetText(),"%lf",&min);
-        sscanf(MaxText->GetText(),"%lf",&max);
+        MinText->GetNumber(&min);
+        MaxText->GetNumber(&max);
         if (max > min) {
            pAxis->SetMinimum(min);
            pAxis->SetMaximum(max);
@@ -297,7 +281,7 @@ void AxisPanel::ProcessMessage(GLComponent *src,int message) {
 
     } else if (src == ColorBtn) {
 
-      GLCColor c = pAxis->GetAxisColor();
+      GLColor c = pAxis->GetAxisColor();
       if( GLColorBox::Display("Choose axis color",&c.r,&c.g,&c.b) ) {
         pAxis->SetAxisColor(c);
         ColorView->SetBackgroundColor(c.r,c.g,c.b);
@@ -307,11 +291,11 @@ void AxisPanel::ProcessMessage(GLComponent *src,int message) {
     } else if ((src == MinText || src == MaxText) && !pAxis->IsAutoScale() && message==MSG_TEXT ) {
 
       double min,max;
-      if( sscanf(MinText->GetText(),"%lf",&min)<=0 ) {
+      if( !MinText->GetNumber(&min) ) {
         error("Min: malformed number.");
         return;
       }
-      if( sscanf(MaxText->GetText(),"%lf",&max)<=0 ) {
+      if(!MaxText->GetNumber(&max)) {
         error("Max: malformed number.");
         return;
       }
@@ -334,7 +318,7 @@ void AxisPanel::ProcessMessage(GLComponent *src,int message) {
 
     } else if (src == TitleText) {
 
-      pAxis->SetName(TitleText->GetText());
+      pAxis->SetName(TitleText->GetText().c_str());
       commit();
 
     }

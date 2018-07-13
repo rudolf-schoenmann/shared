@@ -1,20 +1,4 @@
-/*
-  File:        GLAxis.h
-  Description: 2D 'scientific oriented' chart component (Axis managenent)
-               C++ port of fr.esrf.tangoatk.widget.util.chart
-  Author:      J-L PONS (2007)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-*/
-
+// Copyright (c) 2011 rubicon IT GmbH
 #ifndef _GLCHARTAXISH_
 #define _GLCHARTAXISH_
 
@@ -37,8 +21,8 @@ public:
   ~GLAxis();
 
   // Components method
-  void     SetAxisColor(GLCColor c);
-  GLCColor GetAxisColor();
+  void     SetAxisColor(GLColor c);
+  GLColor GetAxisColor();
   void   SetPercentScrollback(double d);
   double GetPercentScrollback();
   void   SetLabelFormat(int l);
@@ -80,7 +64,7 @@ public:
   void   SetTickLength(int lgth);
   int    GetTickLength();
   char  *GetName();
-  void   SetName(char *s);
+  void   SetName(const char *s);
   void   SetPosition(int o);
   int    GetPosition();
   void   AddDataView(GLDataView *v);
@@ -110,14 +94,14 @@ public:
   SearchInfo *SearchNearest(int x, int y, GLAxis *xAxis);
   void computeLabels(double length);
   void DrawFast(GLCPoint lp, GLCPoint p, GLDataView *v);
-  static void PaintMarker(GLCColor c,int mType, int mSize, int x, int y);
+  static void PaintMarker(GLColor c,int mType, int mSize, int x, int y);
   static void DrawSampleLine(int x, int y, GLDataView *v);
   void PaintDataViews(GLAxis *xAxis, int xOrg, int yOrg);
-  GLCColor ComputeMediumColor(GLCColor c1, GLCColor c2);
-  void  PaintAxis(int x0, int y0, GLAxis *xAxis, int xOrg, int yOrg, GLCColor back,bool oppositeVisible);
-  void  PaintAxisDirect(int x0, int y0,GLCColor back,int tr,int la);
-  void  PaintAxisOpposite(int x0, int y0,GLCColor back,int tr,int la);
-  void  PaintAxisOppositeDouble(int x0, int y0,GLCColor back,int tr,int la);
+  GLColor ComputeMediumColor(GLColor c1, GLColor c2);
+  void  PaintAxis(int x0, int y0, GLAxis *xAxis, int xOrg, int yOrg, GLColor back,bool oppositeVisible);
+  void  PaintAxisDirect(int x0, int y0,GLColor back,int tr,int la);
+  void  PaintAxisOpposite(int x0, int y0,GLColor back,int tr,int la);
+  void  PaintAxisOppositeDouble(int x0, int y0,GLColor back,int tr,int la);
   bool  IsZeroAlwaysVisible();
   void  SetZeroAlwaysVisible(bool zeroAlwaysVisible);
   char *GetDateFormat();
@@ -139,22 +123,22 @@ private:
   SearchInfo *searchNearestXY(int x, int y, GLAxis *xAxis);
   void paintDataViewNormal(GLDataView *v, GLAxis *xAxis, int xOrg, int yOrg);
   void paintDataViewXY(GLDataView *v, GLDataView *w, GLAxis *xAxis, int xOrg, int yOrg);
-  void paintYOutTicks(GLCColor c,int x0, double ys, int y0, int la, int tr,int off,bool grid);
-  void paintXOutTicks(GLCColor c,int y0, double xs, int x0, int la, int tr,int off,bool grid);
+  void paintYOutTicks(GLColor c,int x0, double ys, int y0, int la, int tr,int off,bool grid);
+  void paintXOutTicks(GLColor c,int y0, double xs, int x0, int la, int tr,int off,bool grid);
   int  getTickShift(int width);
   int  getTickShiftOpposite(int width);
-  void paintYTicks(GLCColor c,int i, int x0, double y, int la, int tr,int off,bool grid);
-  void paintXTicks(GLCColor c,int i, int y0, double x, int la, int tr,int off,bool grid);
+  void paintYTicks(GLColor c,int i, int x0, double y, int la, int tr,int off,bool grid);
+  void paintXTicks(GLColor c,int i, int y0, double x, int la, int tr,int off,bool grid);
   int  computeBarWidth(GLDataView *v, GLAxis *xAxis);
   void paintDataViewBar(GLDataView *v,int barWidth,int y0,int x,int y);
   void paintDataViewPolyline(GLDataView *v,int nb,int yOrg,int *pointX,int *pointY);
   int  distance2(int x1, int y1, int x2, int y2);
   void paintBarBorder(int barWidth, int y0, int x, int y);
-  void paintBar(int barWidth, GLCColor background, int fillStyle, int y0, int x, int y);
+  void paintBar(int barWidth, GLColor background, int fillStyle, int y0, int x, int y);
   void addLabel(char *lab, int w, int h, double pos,int offX=0,int offY=0);
   void clearLabel();
   void clip(int x,int y,int width,int height);
-  static void drawLine(GLCColor c,int dash,int lWidth,int x1,int y1,int x2,int y2);
+  static void drawLine(GLColor c,int dash,int lWidth,int x1,int y1,int x2,int y2);
   static GLuint initMarker(char *name);
   static void paintMarkerTex(GLuint mTex,int x,int y,int width,int height,int r,int g,int b);
 
@@ -165,7 +149,7 @@ private:
   double maximum;
   bool autoScale;
   int scale;
-  GLCColor labelColor;
+  GLColor labelColor;
   int labelFormat;
   LabelInfo labels[MAX_VIEWS];
   int nbLabel;

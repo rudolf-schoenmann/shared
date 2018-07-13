@@ -1,19 +1,4 @@
-/*
-  File:        GLChart.h
-  Description: 2D 'scientific oriented' chart component
-               C++ port of fr.esrf.tangoatk.widget.util.chart
-  Author:      J-L PONS (2007)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-*/
+// Copyright (c) 2011 rubicon IT GmbH
 #ifndef _GLCHARTH_
 #define _GLCHARTH_
 
@@ -57,18 +42,18 @@ public:
   GLAxis *GetY2Axis();
   void SetMargin(GLCDimension d);
   GLCDimension GetMargin();
-  void SetBackground(GLCColor c);
-  GLCColor GetBackground();
-  void SetChartBackground(GLCColor c);
-  GLCColor GetChartBackground();
+  void SetBackground(GLColor c);
+  GLColor GetBackground();
+  void SetChartBackground(GLColor c);
+  GLColor GetChartBackground();
   void SetPaintAxisFirst(bool b);
   bool IsPaintAxisFirst();
   void SetHeaderVisible(bool b);
-  void SetHeader(char *s);
+  void SetHeader(const char *s);
   char *GetHeader();
   void SetDisplayDuration(double v);
   double GetDisplayDuration();
-  void SetHeaderColor(GLCColor c);
+  void SetHeaderColor(GLColor c);
   void SetLabelVisible(bool b);
   bool IsLabelVisible();
   void SetLabelPlacement(int p);
@@ -114,11 +99,11 @@ private:
 
   char header[256];
   bool headerVisible;
-  GLCColor headerColor;
+  GLColor headerColor;
 
   bool ipanelVisible;
   bool paintAxisFirst;
-  GLCColor chartBackground;
+  GLColor chartBackground;
 
   double displayDuration;
 

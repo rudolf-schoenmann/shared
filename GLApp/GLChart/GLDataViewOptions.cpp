@@ -1,20 +1,4 @@
-/*
-  File:        GLDataViewOptions.cpp
-  Description: 2D 'scientific oriented' chart component (Dataview options dialog)
-               C++ port of fr.esrf.tangoatk.widget.util.chart
-  Author:      J-L PONS (2007)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-*/
-
+// Copyright (c) 2011 rubicon IT GmbH
 #include "GLChart.h"
 #include "../GLMessageBox.h"
 #include "../GLColorBox.h"
@@ -461,11 +445,11 @@ GLDataViewOptions::GLDataViewOptions(GLChart *chart) : GLTabWindow() {
 
     viewTypeCombo->SetSelectedIndex(dataView->GetViewType());
 
-    GLCColor dColor = dataView->GetColor();
+    GLColor dColor = dataView->GetColor();
     lineColorView->SetBackgroundColor(dColor.r,dColor.g,dColor.b);
-    GLCColor fColor = dataView->GetFillColor();
+    GLColor fColor = dataView->GetFillColor();
     fillColorView->SetBackgroundColor(fColor.r,fColor.g,fColor.b);
-    GLCColor mColor = dataView->GetMarkerColor();
+    GLColor mColor = dataView->GetMarkerColor();
     markerColorView->SetBackgroundColor(mColor.r,mColor.g,mColor.b);
 
     lineWidthSpinner->SetValue(dataView->GetLineWidth());
@@ -617,7 +601,7 @@ GLDataViewOptions::GLDataViewOptions(GLChart *chart) : GLTabWindow() {
       SetVisible(false);
     } else if (src == lineColorBtn) {
 
-      GLCColor c = dataView->GetColor();
+      GLColor c = dataView->GetColor();
       if( GLColorBox::Display("Choose line color",&c.r,&c.g,&c.b) ) {
         dataView->SetColor(c);
         lineColorView->SetBackgroundColor(c.r,c.g,c.b);
@@ -626,7 +610,7 @@ GLDataViewOptions::GLDataViewOptions(GLChart *chart) : GLTabWindow() {
 
     } else if (src == fillColorBtn) {
 
-      GLCColor c = dataView->GetFillColor();
+      GLColor c = dataView->GetFillColor();
       if( GLColorBox::Display("Choose fill color",&c.r,&c.g,&c.b) ) {
         dataView->SetFillColor(c);
         fillColorView->SetBackgroundColor(c.r,c.g,c.b);
@@ -635,7 +619,7 @@ GLDataViewOptions::GLDataViewOptions(GLChart *chart) : GLTabWindow() {
 
     } else if (src == markerColorBtn) {
 
-      GLCColor c = dataView->GetMarkerColor();
+      GLColor c = dataView->GetMarkerColor();
       if( GLColorBox::Display("Choose marker color",&c.r,&c.g,&c.b) ) {
         dataView->SetMarkerColor(c);
         markerColorView->SetBackgroundColor(c.r,c.g,c.b);
@@ -750,7 +734,7 @@ GLDataViewOptions::GLDataViewOptions(GLChart *chart) : GLTabWindow() {
       commit();
     } else if (src == transformA0Text && message==MSG_TEXT) {
 
-      if(sscanf(transformA0Text->GetText(),"%lf",&d)<=0) {
+      if(!transformA0Text->GetNumber(&d)) {
         error("Malformed A0 value");
         return;
       }
@@ -759,7 +743,7 @@ GLDataViewOptions::GLDataViewOptions(GLChart *chart) : GLTabWindow() {
 
     } else if (src == transformA1Text && message==MSG_TEXT) {
 
-      if(sscanf(transformA1Text->GetText(),"%lf",&d)<=0) {
+      if(!transformA1Text->GetNumber(&d)) {
         error("Malformed A1 value");
         return;
       }
@@ -768,7 +752,7 @@ GLDataViewOptions::GLDataViewOptions(GLChart *chart) : GLTabWindow() {
 
     } else if (src == transformA2Text && message==MSG_TEXT) {
 
-      if(sscanf(transformA2Text->GetText(),"%lf",&d)<=0) {
+      if(!transformA2Text->GetNumber(&d)) {
         error("Malformed A2 value");
         return;
       }
@@ -777,12 +761,12 @@ GLDataViewOptions::GLDataViewOptions(GLChart *chart) : GLTabWindow() {
 
     } else if (src == lineNameText) {
 
-      dataView->SetName(lineNameText->GetText());
+      dataView->SetName(lineNameText->GetText().c_str());
       commit();
 
     } else if (src == tensionText && message==MSG_TEXT) {
 
-      if(sscanf(tensionText->GetText(),"%lf",&d)<=0) {
+      if(!tensionText->GetNumber(&d)) {
         error("Malformed tension value");
         return;
       }
@@ -791,7 +775,7 @@ GLDataViewOptions::GLDataViewOptions(GLChart *chart) : GLTabWindow() {
 
     } else if (src == biasText && message==MSG_TEXT) {
 
-      if(sscanf(biasText->GetText(),"%lf",&d)<=0) {
+      if(!biasText->GetNumber(&d)) {
         error("Malformed bias value");
         return;
       }
@@ -800,7 +784,7 @@ GLDataViewOptions::GLDataViewOptions(GLChart *chart) : GLTabWindow() {
 
     } else if (src == sigmaText && message==MSG_TEXT) {
 
-      if(sscanf(sigmaText->GetText(),"%lf",&d)<=0) {
+      if(!sigmaText->GetNumber(&d)) {
         error("Malformed sigma value");
         return;
       }

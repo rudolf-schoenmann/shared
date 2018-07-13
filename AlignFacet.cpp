@@ -1,7 +1,9 @@
 /*
-File:        AlignFacet.cpp
-Description: Align facet to an other dialog
-Program:     MolFlow
+Program:     MolFlow+ / Synrad+
+Description: Monte Carlo simulator for ultra-high vacuum and synchrotron radiation
+Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
+Copyright:   E.S.R.F / CERN
+Website:     https://cern.ch/molflow
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -12,8 +14,9 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-*/
 
+Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+*/
 #include "AlignFacet.h"
 #include "Facet_shared.h"
 #include "GLApp/GLTitledPanel.h"
@@ -138,7 +141,7 @@ void AlignFacet::ProcessMessage(GLComponent *src,int message) {
 			}
 			bool foundSource = false;
 			size_t sourceFacetId;
-			for (auto mem:memorizedSelection) { //find source facet
+			for (auto& mem:memorizedSelection) { //find source facet
 				if ( Contains(appSelectedFacets,mem)) {
 					if (!foundSource) {
 						foundSource = true;
@@ -252,7 +255,7 @@ dirDestVertexId,
 void AlignFacet::MemorizeSelection() {
 	memorizedSelection = geom->GetSelectedFacets();
 	oriPositions.clear();
-	for (auto sel : memorizedSelection) {
+	for (auto& sel : memorizedSelection) {
 		std::vector<Vector3d> op;
 		for (size_t ind = 0; ind < geom->GetFacet(sel)->sh.nbIndex; ind++)
 			op.push_back(*geom->GetVertex(geom->GetFacet(sel)->indices[ind]));

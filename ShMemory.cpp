@@ -1,21 +1,22 @@
 /*
-  File:        ShMemory.cpp
-  Description: Shared memory management
-  Program:     MolFlow
-  Author:      R. KERSEVAN / J-L PONS / M ADY
-  Copyright:   E.S.R.F / CERN
+Program:     MolFlow+ / Synrad+
+Description: Monte Carlo simulator for ultra-high vacuum and synchrotron radiation
+Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
+Copyright:   E.S.R.F / CERN
+Website:     https://cern.ch/molflow
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 */
-
 #ifdef WIN
 #define NOMINMAX
 #include <windows.h>
@@ -51,7 +52,8 @@ Dataport *CreateDataport(char *name,size_t size)
    
    // 2^32 = 4294967296      DWORD is 32-bit unsigned
    DWORD sizeHighOrder = DWORD(size >> 32);
-   DWORD sizeLowOrder = DWORD(size - (size >> 32) * 4294967296);
+   //DWORD sizeLowOrder = DWORD(size - (size >> 32) * 4294967296);
+   DWORD sizeLowOrder = DWORD(size & 0xffffffff);
 
    //Debug:
    //dp->file = CreateFile(name, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -109,12 +111,14 @@ Dataport *CreateDataport(char *name,size_t size)
    
    //memset(dp->buff, 0, size);//Debug
 
+   dp->size = size;
+
    return (dp);
 }
 
 // OpenDataport: Connect to an existing block
 
-Dataport *OpenDataport(char *name/*,size_t size*/)
+Dataport *OpenDataport(char *name,size_t size)
 {
    Dataport *dp;
 
@@ -190,7 +194,7 @@ Dataport *OpenDataport(char *name/*,size_t size*/)
 	   return NULL;
 
    }
-
+   dp->size = size;
    return (dp);
 }
 

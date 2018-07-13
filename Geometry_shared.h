@@ -1,3 +1,22 @@
+/*
+Program:     MolFlow+ / Synrad+
+Description: Monte Carlo simulator for ultra-high vacuum and synchrotron radiation
+Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
+Copyright:   E.S.R.F / CERN
+Website:     https://cern.ch/molflow
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+*/
 #pragma once
 #include "Polygon.h"
 #include "File.h"
@@ -51,10 +70,10 @@ protected:
 	void ResetTextureLimits(); //Different Molflow vs. Synrad
 	void CalculateFacetParam(Facet *f);
 	void Merge(size_t nbV, size_t nbF, Vector3d *nV, Facet **nF); // Merge geometry
-	void LoadTXTGeom(FileReader *file, size_t *nbV, size_t *nbF, InterfaceVertex **V, Facet ***F, size_t strIdx = 0);
-	void InsertTXTGeom(FileReader *file, size_t *nbV, size_t *nbF, InterfaceVertex **V, Facet ***F, size_t strIdx = 0, bool newStruct = false);
-	void InsertGEOGeom(FileReader *file, size_t *nbV, size_t *nbF, InterfaceVertex **V, Facet ***F, size_t strIdx = 0, bool newStruct = false);
-	void InsertSTLGeom(FileReader *file, size_t *nbV, size_t *nbF, InterfaceVertex **V, Facet ***F, size_t strIdx = 0, double scaleFactor = 1.0, bool newStruct = false);
+	void LoadTXTGeom(FileReader *file, Worker* worker, size_t strIdx = 0);
+	void InsertTXTGeom(FileReader *file, size_t strIdx = 0, bool newStruct = false);
+	void InsertGEOGeom(FileReader *file, size_t strIdx = 0, bool newStruct = false);
+	void InsertSTLGeom(FileReader *file, size_t strIdx = 0, double scaleFactor = 1.0, bool newStruct = false);
 	void AdjustProfile();
 	void BuildShapeList();
 	void BuildSelectList();
@@ -97,18 +116,18 @@ public:
 	void SelectCoplanar(int width, int height, double tolerance);
 	Facet    *GetFacet(size_t facet);
 	InterfaceVertex *GetVertex(size_t idx);
-	AABB     GetBB();
+	AxisAlignedBoundingBox     GetBB();
 	Vector3d GetCenter();
 
 	// Collapsing stuff
-	int  AddRefVertex(InterfaceVertex *p, InterfaceVertex *refs, int *nbRef, double vT);
+	int  AddRefVertex(const InterfaceVertex& p, InterfaceVertex *refs, int *nbRef, double vT);
 	bool RemoveNullFacet();
 	Facet *MergeFacet(Facet *f1, Facet *f2);
 	bool GetCommonEdges(Facet *f1, Facet *f2, size_t * c1, size_t * c2, size_t * chainLength);
 	void CollapseVertex(Worker *work, GLProgress *prg, double totalWork, double vT);
 	void RenumberNeighbors(const std::vector<int> &newRefs);
 
-	void LoadTXT(FileReader *file, GLProgress *prg);
+	void LoadTXT(FileReader *file, GLProgress *prg, Worker* worker);
 	void LoadSTR(FileReader *file, GLProgress *prg);
 	void LoadSTL(FileReader *file, GLProgress *prg, double scaleFactor);
 	void LoadASE(FileReader *file, GLProgress *prg);
@@ -189,14 +208,14 @@ protected:
 	void AddToSelectedVertexList(size_t vertexId);
 	void DrawFacet(Facet *f, bool offset = false, bool showHidden = false, bool selOffset = false);
 	void FillFacet(Facet *f, bool addTextureCoord);
-	void AddTextureCoord(Facet *f, Vector2d *p);
+	void AddTextureCoord(Facet *f, const Vector2d *p);
 	void DrawPolys();
 	void RenderArrow(GLfloat *matView, float dx, float dy, float dz, float px, float py, float pz, float d);
 	void DeleteGLLists(bool deletePoly = false, bool deleteLine = false);
 	void SetCullMode(int mode);
-	int  FindEar(POLYGON *p);
+	int  FindEar(const GLAppPolygon& p);
 	void Triangulate(Facet *f, bool addTextureCoord);
-	void DrawEar(Facet *f, POLYGON *p, int ear, bool addTextureCoord);
+	void DrawEar(Facet *f, const GLAppPolygon& p, int ear, bool addTextureCoord);
 public:
 	void SelectAll();
 	void UnselectAll();
@@ -230,8 +249,8 @@ protected:
 
 										  // Geometry
 	Facet    **facets;    // All facets of this geometry
-	InterfaceVertex  *vertices3; // Vertices (3D space), can be selected
-	AABB bb;              // Global Axis Aligned Bounding Box (AABB)
+	std::vector<InterfaceVertex> vertices3; // Vertices (3D space), can be selected
+	AxisAlignedBoundingBox bb;              // Global Axis Aligned Bounding Box (AxisAlignedBoundingBox)
 	float normeRatio;     // Norme factor (direction field)
 	bool  autoNorme;      // Auto normalize (direction field)
 	bool  centerNorme;    // Center vector (direction field)
@@ -258,14 +277,6 @@ protected:
 	GLint sphereList;             // Compiled geometry of sphere used for direction field
 
 	public:
-		llong loaded_nbMCHit;
-		double loaded_nbHitEquiv;
-		llong loaded_nbDesorption;
-		llong loaded_desorptionLimit;
-		llong   loaded_nbLeak;
-		double loaded_nbAbsEquiv;
-		double loaded_distTraveledTotal;
-
 		bool  texAutoScale;  // Autoscale flag
 		bool  texColormap;   // Colormap flag
 		bool  texLogScale;   // Texture im log scale

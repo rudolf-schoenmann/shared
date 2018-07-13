@@ -1,9 +1,9 @@
 /*
-File:        CollapseSettings.cpp
-Description: Collapse settings dialog
-Program:     MolFlow
-Author:      R. KERSEVAN / J-L PONS / M ADY
+Program:     MolFlow+ / Synrad+
+Description: Monte Carlo simulator for ultra-high vacuum and synchrotron radiation
+Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
 Copyright:   E.S.R.F / CERN
+Website:     https://cern.ch/molflow
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -14,6 +14,8 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
+
+Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 */
 #include "GLApp\GLToggle.h"
 
@@ -29,6 +31,7 @@ GNU General Public License for more details.
 #include "VertexCoordinates.h"
 #include "FacetCoordinates.h"
 #include "ProfilePlotter.h"
+#include "HistogramPlotter.h"
 #include "Geometry_shared.h"
 
 #ifdef MOLFLOW
@@ -183,6 +186,7 @@ void CollapseSettings::ProcessMessage(GLComponent *src,int message) {
 				if (mApp->vertexCoordinates) mApp->vertexCoordinates->Update();
 				if (mApp->facetCoordinates) mApp->facetCoordinates->UpdateFromSelection();
 				if (mApp->profilePlotter) mApp->profilePlotter->Refresh();
+				if (mApp->histogramPlotter) mApp->histogramPlotter->Refresh();
 #ifdef MOLFLOW
 				if (mApp->pressureEvolution) mApp->pressureEvolution->Refresh();
 				if (mApp->timewisePlotter) mApp->timewisePlotter->Refresh();

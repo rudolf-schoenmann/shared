@@ -1,18 +1,4 @@
-/*
-  File:        GLFileBox.cpp
-  Description: File selection box class (SDL/OpenGL OpenGL application framework)
-  Author:      J-L PONS (2007)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-*/
+// Copyright (c) 2011 rubicon IT GmbH
 #define NOMINMAX
 #include "GLWindow.h"
 #include "GLFileBox.h"
@@ -191,8 +177,8 @@ void GLFileBox::ProcessMessage(GLComponent *src,int message) {
         return;
       }
       if( src==okButton ) {
-        strcpy(curFile,fileText->GetSelectedValue());
-        strcpy(curPath,pathText->GetSelectedValue());
+        strcpy(curFile,fileText->GetSelectedValue().c_str());
+        strcpy(curPath,pathText->GetSelectedValue().c_str());
         rCode = OK_BTN;
         GLWindow::ProcessMessage(NULL,MSG_CLOSE);
         return;
@@ -207,9 +193,9 @@ void GLFileBox::ProcessMessage(GLComponent *src,int message) {
     case MSG_TEXT: {
       if( src->GetId() == PATH_TEXT ) {
         // Return pressed in nameText
-        char *nPath = pathText->GetSelectedValue();
-        if( CheckDirectory(nPath) ) {
-          UpdateFileList(nPath);
+        std::string nPath = pathText->GetSelectedValue();
+        if( CheckDirectory(nPath.c_str()) ) {
+          UpdateFileList(nPath.c_str());
           AddToPathHist(curPath);
         } else {
           pathText->SetSelectedValue(curPath);
@@ -226,8 +212,8 @@ void GLFileBox::ProcessMessage(GLComponent *src,int message) {
           UpdateFileList(curPath);
         }
       } else if ( src==pathText ) {
-        char *nPath = pathText->GetSelectedValue();
-        UpdateFileList(nPath);
+        std::string nPath = pathText->GetSelectedValue();
+        UpdateFileList(nPath.c_str());
       }
     } break;
 
@@ -276,7 +262,7 @@ void GLFileBox::ProcessMessage(GLComponent *src,int message) {
   GLWindow::ProcessMessage(src,message);
 }
 
-bool GLFileBox::CheckDirectory(char *dirName) {
+bool GLFileBox::CheckDirectory(const char *dirName) {
 
 #ifdef WIN
 
@@ -721,7 +707,7 @@ void GLFileBox::Back() {
 
 }
 
-void GLFileBox::UpdateFileList(char *path) {
+void GLFileBox::UpdateFileList(const char *path) {
 
   vector<string> files;
   int nbFile = 0;

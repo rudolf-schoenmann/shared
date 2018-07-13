@@ -1,19 +1,4 @@
-/*
-  File:        GLTextField.cpp
-  Description: Text area class (SDL/OpenGL OpenGL application framework)
-  Author:      Marton ADY (2013)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-*/
-
+// Copyright (c) 2011 rubicon IT GmbH
 #include "GLWindow.h"
 #include "GLTextField.h"
 #include "GLToolkit.h"
@@ -32,7 +17,7 @@ GLTextField::GLTextField(int compId,const char *text):GLComponent(compId) {
   SetCursor(CURSOR_TEXT);
 }
 
-char *GLTextField::GetText() {
+std::string GLTextField::GetText() {
   return m_Text;
 }
 

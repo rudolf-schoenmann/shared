@@ -1,20 +1,4 @@
-/*
-  File:        GLDataView.h
-  Description: 2D 'scientific oriented' chart component (Data views managenent)
-               C++ port of fr.esrf.tangoatk.widget.util.chart
-  Author:      J-L PONS (2007)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-*/
-
+// Copyright (c) 2011 rubicon IT GmbH
 #ifndef _GLCHARTDATAVIEWH_
 #define _GLCHARTDATAVIEWH_
 
@@ -47,18 +31,18 @@ public:
   int GetFillStyle();
   void SetFillMethod(int m);
   int GetFillMethod();
-  void SetFillColor(GLCColor c);
-  GLCColor GetFillColor();
-  void SetColor(GLCColor c);
-  GLCColor GetColor();
+  void SetFillColor(GLColor c);
+  GLColor GetFillColor();
+  void SetColor(GLColor c);
+  GLColor GetColor();
   bool IsFill();
   void SetFill(bool b);
   void SetClickable(bool b);
   bool IsClickable();
   void SetLabelVisible(bool b);
   bool IsLabelVisible();
-  GLCColor GetLabelColor();
-  void SetLabelColor (GLCColor labelColor);
+  GLColor GetLabelColor();
+  void SetLabelColor (GLColor labelColor);
   void SetInterpolationMethod(int method);
   int GetInterpolationMethod();
   void SetInterpolationStep(int step);
@@ -79,15 +63,15 @@ public:
   int GetMathFunction();
   void SetBarWidth(int w);
   int GetBarWidth();
-  void SetMarkerColor(GLCColor c);
-  GLCColor GetMarkerColor();
+  void SetMarkerColor(GLColor c);
+  GLColor GetMarkerColor();
   void SetStyle(int c);
   int GetMarkerSize();
   void SetMarkerSize(int c);
   int GetStyle();
   int GetLineWidth();
   void SetLineWidth(int c);
-  void SetName(char *s);
+  void SetName(const char *s);
   char *GetName();
   void SetUnit(char *s);
   char *GetUnit();
@@ -163,9 +147,9 @@ private:
   void addPts(Point2D *p,APoint2D pt);
 
   GLAxis *parentAxis;
-  GLCColor lineColor;
-  GLCColor fillColor;
-  GLCColor markerColor;
+  GLColor lineColor;
+  GLColor fillColor;
+  GLColor markerColor;
   int lineStyle;
   int lineWidth;
   int markerType;
@@ -192,7 +176,7 @@ private:
   bool clickable;
   bool labelVisible;
   char *userFormat;
-  GLCColor labelColor;
+  GLColor labelColor;
   int interpMethod;
   int interpStep;
   double interpTension;

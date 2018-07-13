@@ -1,3 +1,4 @@
+// Copyright (c) 2011 rubicon IT GmbH
 #pragma once
 /*
   File:        GLContainer.h

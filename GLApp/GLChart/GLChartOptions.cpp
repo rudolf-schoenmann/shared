@@ -1,20 +1,4 @@
-/*
-  File:        GLChartOptions.cpp
-  Description: 2D 'scientific oriented' chart component (Chart options dialog)
-               C++ port of fr.esrf.tangoatk.widget.util.chart
-  Author:      J-L PONS (2007)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-*/
-
+// Copyright (c) 2011 rubicon IT GmbH
 #include "GLChart.h"
 #include "../GLMessageBox.h"
 #include "../GLColorBox.h"
@@ -72,7 +56,7 @@ GLChartOptions::GLChartOptions(GLChart *chart) : GLTabWindow() {
     generalBackColorView = new GLLabel("");
     generalBackColorView->SetOpaque(true);
     generalBackColorView->SetBorder(BORDER_ETCHED);
-    GLCColor bColor = chart->GetChartBackground();
+    GLColor bColor = chart->GetChartBackground();
     generalBackColorView->SetBackgroundColor(bColor.r,bColor.g,bColor.b);
     generalBackColorBtn = new GLButton(0,"...");
 
@@ -258,7 +242,7 @@ GLChartOptions::GLChartOptions(GLChart *chart) : GLTabWindow() {
       SetVisible(false);
     } else if (src == generalBackColorBtn) {
 
-      GLCColor c = chart->GetChartBackground();
+      GLColor c = chart->GetChartBackground();
       if( GLColorBox::Display("Choose background",&c.r,&c.g,&c.b) ) {
         chart->SetChartBackground(c);
         generalBackColorView->SetBackgroundColor(c.r,c.g,c.b);
@@ -351,17 +335,17 @@ GLChartOptions::GLChartOptions(GLChart *chart) : GLTabWindow() {
     // General ------------------------------------------------------------
     } else if (src == generalLegendText) {
 
-      chart->SetHeader(generalLegendText->GetText());
+      chart->SetHeader(generalLegendText->GetText().c_str());
       commit();
 
     } else if (src == generalDurationText) {
 
-      if (_stricmp(generalDurationText->GetText(),"infinty")==0) {
+      if (_stricmp(generalDurationText->GetText().c_str(),"infinty")==0) {
         chart->SetDisplayDuration(MAX_VALUE);
         return;
       }
       double d;
-      if( sscanf(generalDurationText->GetText(),"%lf",&d)<=0 ) {
+      if( !generalDurationText->GetNumber(&d)) {
         error("Display duration: malformed number.");
         d = chart->GetDisplayDuration();
         if(d==MAX_VALUE) sprintf(tmp,"Infinity");

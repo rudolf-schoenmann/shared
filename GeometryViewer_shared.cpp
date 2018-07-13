@@ -1,3 +1,22 @@
+/*
+Program:     MolFlow+ / Synrad+
+Description: Monte Carlo simulator for ultra-high vacuum and synchrotron radiation
+Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
+Copyright:   E.S.R.F / CERN
+Website:     https://cern.ch/molflow
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+*/
 #include "GLApp/GLApp.h"
 #include "GLApp/GLWindowManager.h"
 #include "GeometryViewer.h"
@@ -600,7 +619,7 @@ void GeometryViewer::SetWorker(Worker *w) {
 	ToFrontView();
 	// Auto size vector length (consider Front View)
 	Geometry *geom = work->GetGeometry();
-	AABB bb = geom->GetBB();
+	AxisAlignedBoundingBox bb = geom->GetBB();
 	vectorLength = Max((bb.max.x - bb.min.x), (bb.max.y - bb.min.y)) / 3.0;
 	arrowLength = 10.0 / vectorLength;//Max((bb.max.z-bb.min.z),vectorLength);
 }
@@ -619,7 +638,7 @@ void GeometryViewer::DrawIndex() {
 	//Mark vertices of selected facets
 	std::vector<bool> vertexOnSelectedFacet(nbVertex, false);
 	std::vector<size_t> vertexId(nbVertex);
-	for (auto selId:selectedFacets) {
+	for (auto& selId:selectedFacets) {
 		Facet *f = geom->GetFacet(selId);
 			for (size_t i = 0; i < f->sh.nbIndex; i++) {
 				vertexOnSelectedFacet[f->indices[i]] = true;
@@ -816,10 +835,10 @@ void GeometryViewer::DrawLeak() {
 		glDisable(GL_BLEND);
 		glDisable(GL_CULL_FACE);
 		glEnable(GL_LINE_SMOOTH);
-		for (size_t i = 0; i < Min(dispNumLeaks,mApp->worker.leakCacheSize); i++) {
+		for (size_t i = 0; i < Min(dispNumLeaks,mApp->worker.globalHitCache.leakCacheSize); i++) {
 
-			Vector3d p = mApp->worker.leakCache[i].pos;
-			Vector3d d = mApp->worker.leakCache[i].dir;
+			Vector3d p = mApp->worker.globalHitCache.leakCache[i].pos;
+			Vector3d d = mApp->worker.globalHitCache.leakCache[i].dir;
 
 			glColor3f(0.9f, 0.2f, 0.5f);
 			glBegin(GL_POINTS);
@@ -1888,9 +1907,9 @@ void GeometryViewer::ComputeBB(/*bool getAll*/) {
 	zFar = -1e100;
 	mv.LoadGL(matView);
 
-	//Transform the AABB (fast method, but less accurate 
+	//Transform the AxisAlignedBoundingBox (fast method, but less accurate 
 	//than full vertex transform)
-	//AABB bbO = geom->GetBB();
+	//AxisAlignedBoundingBox bbO = geom->GetBB();
 	//TRANSFORMBB(min.x,min.y,min.z);
 	//TRANSFORMBB(max.x,min.y,min.z);
 	//TRANSFORMBB(max.x,min.y,max.z);
@@ -1912,7 +1931,7 @@ void GeometryViewer::ComputeBB(/*bool getAll*/) {
 
 //#ifdef SYNRAD		
 		//regions included
-		AABB bb = geom->GetBB();
+		AxisAlignedBoundingBox bb = geom->GetBB();
 		TRANSFORMVERTEX(bb.min.x, bb.min.y, bb.min.z);
 		TRANSFORMVERTEX(bb.max.x, bb.min.y, bb.min.z);
 		TRANSFORMVERTEX(bb.min.x, bb.max.y, bb.min.z);
@@ -1933,7 +1952,7 @@ void GeometryViewer::ComputeBB(/*bool getAll*/) {
 		size_t nbF = geom->GetNbFacet();
 		for (int i = 0; i < nbF; i++) {
 			Facet *f = geom->GetFacet(i);
-			if (f->sh.superIdx == geom->viewStruct) {
+			if (f->sh.superIdx == geom->viewStruct || f->sh.superIdx == -1) {
 				for (int j = 0; j < f->sh.nbIndex; j++) refIdx[f->indices[j]] = true;
 			}
 		}
@@ -1972,7 +1991,7 @@ void Geometry::BuildFacetMeshLists()
 	size_t nbFacet = mApp->worker.GetGeometry()->GetNbFacet();
 	for (size_t i = 0; i < nbFacet; i++) {
 		prg->SetProgress((double)i / (double)nbFacet);
-		mApp->worker.GetGeometry()->GetFacet(i)->BuildMeshList();
+		mApp->worker.GetGeometry()->GetFacet(i)->BuildMeshGLList();
 
 	}
 	prg->SetVisible(false);

@@ -1,19 +1,4 @@
-/*
-  File:        GLCombo.h
-  Description: ComboBox class (SDL/OpenGL OpenGL application framework)
-  Author:      J-L PONS (2007)
-
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-*/
-
+// Copyright (c) 2011 rubicon IT GmbH
 #ifndef _GLCOMBOH_
 #define _GLCOMBOH_
 
@@ -38,9 +23,9 @@ public:
   void ScrollTextToEnd();
   void SetSelectedIndex(int idx);
   int  GetSelectedIndex();
-  char *GetSelectedValue();
+  std::string GetSelectedValue();
   void SetEditable(bool editable);
-  char *GetValueAt(size_t row);
+  std::string GetValueAt(size_t row);
   size_t  GetNbRow();
 
   // Implementation

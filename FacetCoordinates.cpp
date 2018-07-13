@@ -1,21 +1,22 @@
 /*
-  File:        FacetCoordinates.cpp
-  Description: Facet coordinates window
-  Program:     MolFlow
-  Author:      R. Kerservan / J-L PONS / M ADY
-  Copyright:   E.S.R.F / CERN
+Program:     MolFlow+ / Synrad+
+Description: Monte Carlo simulator for ultra-high vacuum and synchrotron radiation
+Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
+Copyright:   E.S.R.F / CERN
+Website:     https://cern.ch/molflow
 
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 */
-
 #include "FacetCoordinates.h"
 #include "Facet_shared.h"
 #include "GLApp/GLTitledPanel.h"
@@ -364,15 +365,10 @@ void FacetCoordinates::ApplyChanges(){
 			mApp->changedSinceSave=true;
 
 			//Change number of vertices
-			SAFE_FREE(selFacet->indices);
-			SAFE_FREE(selFacet->vertices2);
-			SAFE_FREE(selFacet->visible);
 			selFacet->sh.nbIndex = (int)lines.size();
-			selFacet->indices = (size_t *)malloc(selFacet->sh.nbIndex*sizeof(size_t));
-			selFacet->vertices2 = (Vector2d *)malloc(selFacet->sh.nbIndex*sizeof(Vector2d));
-			memset(selFacet->vertices2,0,selFacet->sh.nbIndex * sizeof(Vector2d));
-			selFacet->visible = (bool *)malloc(selFacet->sh.nbIndex*sizeof(bool));
-			memset(selFacet->visible,0xFF,selFacet->sh.nbIndex*sizeof(bool));
+			selFacet->indices.resize(selFacet->sh.nbIndex);
+			selFacet->vertices2.resize(selFacet->sh.nbIndex);
+			selFacet->visible.resize(selFacet->sh.nbIndex);
 
 			for(size_t i=0;i<lines.size();i++) {
 				geom->MoveVertexTo(lines[i].vertexId,lines[i].coord.x,lines[i].coord.y,lines[i].coord.z);

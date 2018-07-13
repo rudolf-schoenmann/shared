@@ -1,3 +1,22 @@
+/*
+Program:     MolFlow+ / Synrad+
+Description: Monte Carlo simulator for ultra-high vacuum and synchrotron radiation
+Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
+Copyright:   E.S.R.F / CERN
+Website:     https://cern.ch/molflow
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+*/
 #include "Interface.h"
 #include <direct.h> //_getcwd()
 #include <io.h> // Check for recovery
@@ -28,6 +47,7 @@
 #include "GeometryViewer.h"
 #include "CollapseSettings.h"
 #include "HistogramSettings.h"
+#include "HistogramPlotter.h"
 #include "MoveVertex.h"
 #include "ScaleVertex.h"
 #include "ScaleFacet.h"
@@ -86,7 +106,7 @@ Interface::Interface() {
 	leftHandedView = false;
 	autoUpdateFormulas = true;
 	compressSavedFiles = true;
-	/*double gasMass=28;
+	/*double wp.gasMass=28;
 	double totalOutgassing=0.0; //total outgassing in Pa*m3/sec (internally everything is in SI units)
 	double totalInFlux = 0.0; //total incoming molecules per second. For anisothermal system, it is (totalOutgassing / Kb / T)*/
 	autoSaveFrequency = 10.0; //in minutes
@@ -125,6 +145,7 @@ Interface::Interface() {
 	//formulaSettings = NULL;
 	collapseSettings = NULL;
 	histogramSettings = NULL;
+	histogramPlotter = NULL;
 	moveVertex = NULL;
 	scaleVertex = NULL;
 	scaleFacet = NULL;
@@ -492,7 +513,7 @@ void Interface::UpdateModelParams() {
 	facetList->SetColumnLabels((char **)cName);
 	UpdateFacetHits(true);
 	UpdateFacetlistSelected();
-	AABB bb = geom->GetBB();
+	AxisAlignedBoundingBox bb = geom->GetBB();
 
 	for (int i = 0; i < geom->GetNbFacet(); i++) {
 		Facet *f = geom->GetFacet(i);
@@ -782,9 +803,11 @@ void Interface::OneTimeSceneInit_shared_pre() {
 	menu->GetSubMenu("Tools")->Add(NULL); // Separator
 	menu->GetSubMenu("Tools")->Add("Texture Plotter ...", MENU_TOOLS_TEXPLOTTER, SDLK_t, ALT_MODIFIER);
 	menu->GetSubMenu("Tools")->Add("Profile Plotter ...", MENU_TOOLS_PROFPLOTTER, SDLK_p, ALT_MODIFIER);
+	menu->GetSubMenu("Tools")->Add("Histogram Plotter...", MENU_TOOLS_HISTOGRAMPLOTTER);
 	menu->GetSubMenu("Tools")->Add(NULL); // Separator
 	menu->GetSubMenu("Tools")->Add("Texture scaling...", MENU_EDIT_TSCALING, SDLK_d, CTRL_MODIFIER);
 	menu->GetSubMenu("Tools")->Add("Particle logger...", MENU_TOOLS_PARTICLELOGGER);
+	menu->GetSubMenu("Tools")->Add("Histogram settings...", MENU_TOOLS_HISTOGRAMSETTINGS, SDLK_t, CTRL_MODIFIER);
 	menu->GetSubMenu("Tools")->Add("Global Settings ...", MENU_EDIT_GLOBALSETTINGS);
 	menu->GetSubMenu("Tools")->Add(NULL); // Separator
 	menu->GetSubMenu("Tools")->Add("Take screenshot", MENU_TOOLS_SCREENSHOT,SDLK_r, CTRL_MODIFIER);
@@ -797,7 +820,7 @@ void Interface::OneTimeSceneInit_shared_pre() {
 	menu->GetSubMenu("Facet")->Add("Delete", MENU_FACET_REMOVESEL, SDLK_DELETE, CTRL_MODIFIER);
 	menu->GetSubMenu("Facet")->Add("Swap normal", MENU_FACET_SWAPNORMAL, SDLK_n, CTRL_MODIFIER);
 	menu->GetSubMenu("Facet")->Add("Shift indices", MENU_FACET_SHIFTVERTEX, SDLK_h, CTRL_MODIFIER);
-	menu->GetSubMenu("Facet")->Add("Facet coordinates ...", MENU_FACET_COORDINATES, SDLK_t, CTRL_MODIFIER);
+	menu->GetSubMenu("Facet")->Add("Facet coordinates ...", MENU_FACET_COORDINATES);
 	menu->GetSubMenu("Facet")->Add("Move ...", MENU_FACET_MOVE);
 	menu->GetSubMenu("Facet")->Add("Scale ...", MENU_FACET_SCALE);
 	menu->GetSubMenu("Facet")->Add("Mirror / Project ...", MENU_FACET_MIRROR);
@@ -1002,9 +1025,8 @@ void Interface::OneTimeSceneInit_shared_pre() {
 	facetDetailsBtn = new GLButton(0, "Details...");
 	facetPanel->Add(facetDetailsBtn);
 
-	facetHistogramBtn = new GLButton(0, "Histogr.");
-	facetHistogramBtn->SetEnabled(false); //coming in next version
-	facetPanel->Add(facetHistogramBtn);
+	facetCoordBtn = new GLButton(0, "Coord.");
+	facetPanel->Add(facetCoordBtn);
 
 	facetApplyBtn = new GLButton(0, "Apply");
 	facetApplyBtn->SetEnabled(false);
@@ -1012,6 +1034,9 @@ void Interface::OneTimeSceneInit_shared_pre() {
 }
 
 void Interface::OneTimeSceneInit_shared_post() {
+	menu->Add("About");
+	menu->GetSubMenu("About")->Add("License", MENU_ABOUT);
+
 	ClearFacetParams();
 	LoadConfig();
 	UpdateRecentMenu();
@@ -1049,6 +1074,7 @@ int Interface::RestoreDeviceObjects_shared() {
 	RVALIDATE_DLG(formulaEditor);
 	RVALIDATE_DLG(collapseSettings);
 	RVALIDATE_DLG(histogramSettings);
+	RVALIDATE_DLG(histogramPlotter);
 	RVALIDATE_DLG(moveVertex);
 	RVALIDATE_DLG(scaleVertex);
 	RVALIDATE_DLG(scaleFacet);
@@ -1089,6 +1115,7 @@ int Interface::InvalidateDeviceObjects_shared() {
 	IVALIDATE_DLG(formulaEditor);
 	IVALIDATE_DLG(collapseSettings);
 	IVALIDATE_DLG(histogramSettings);
+	IVALIDATE_DLG(histogramPlotter);
 	IVALIDATE_DLG(moveVertex);
 	IVALIDATE_DLG(scaleVertex);
 	IVALIDATE_DLG(scaleFacet);
@@ -1190,6 +1217,22 @@ bool Interface::ProcessMessage_shared(GLComponent *src, int message) {
 				formulaEditor->SetVisible(TRUE);
 			}
 			break;
+		case MENU_TOOLS_HISTOGRAMSETTINGS:
+			if (!histogramSettings || !histogramSettings->IsVisible()) {
+				SAFE_DELETE(histogramSettings);
+				histogramSettings = new HistogramSettings(geom, &worker);
+			}
+			histogramSettings->Refresh(geom->GetSelectedFacets());
+			histogramSettings->SetVisible(true);
+			return true;
+		case MENU_TOOLS_HISTOGRAMPLOTTER:
+			if (!histogramPlotter || !histogramPlotter->IsVisible()) {
+				SAFE_DELETE(histogramPlotter);
+				histogramPlotter = new HistogramPlotter(&worker);
+			}
+			histogramPlotter->Refresh();
+			histogramPlotter->SetVisible(true);
+			return true;
 		case MENU_TOOLS_PARTICLELOGGER:
 			if (!particleLogger || !particleLogger->IsVisible()) {
 				SAFE_DELETE(particleLogger);
@@ -1439,10 +1482,10 @@ bool Interface::ProcessMessage_shared(GLComponent *src, int message) {
 			geom->UnselectAll();
 			for (int i = 0; i < geom->GetNbFacet(); i++) {
 #ifdef MOLFLOW
-				if (geom->GetFacet(i)->counterCache.hit.nbAbsEquiv > 0)
+				if (geom->GetFacet(i)->facetHitCache.hit.nbAbsEquiv > 0)
 #endif
 #ifdef SYNRAD
-					if (geom->GetFacet(i)->counterCache.nbAbsEquiv > 0)
+					if (geom->GetFacet(i)->facetHitCache.nbAbsEquiv > 0)
 #endif
 					geom->SelectFacet(i);
 			}
@@ -1455,10 +1498,10 @@ bool Interface::ProcessMessage_shared(GLComponent *src, int message) {
 			for (int i = 0; i < geom->GetNbFacet(); i++)
 
 #ifdef MOLFLOW
-				if (geom->GetFacet(i)->counterCache.hit.nbMCHit > 0)
+				if (geom->GetFacet(i)->facetHitCache.hit.nbMCHit > 0)
 #endif
 #ifdef SYNRAD
-					if (geom->GetFacet(i)->counterCache.nbMCHit > 0)
+					if (geom->GetFacet(i)->facetHitCache.nbMCHit > 0)
 #endif
 					geom->SelectFacet(i);
 			geom->UpdateSelection();
@@ -1478,10 +1521,10 @@ bool Interface::ProcessMessage_shared(GLComponent *src, int message) {
 			geom->UnselectAll();
 			for (int i = 0; i < geom->GetNbFacet(); i++)
 #ifdef MOLFLOW
-				if (geom->GetFacet(i)->counterCache.hit.nbMCHit == 0 && geom->GetFacet(i)->sh.area >= largeAreaThreshold)
+				if (geom->GetFacet(i)->facetHitCache.hit.nbMCHit == 0 && geom->GetFacet(i)->sh.area >= largeAreaThreshold)
 #endif
 #ifdef SYNRAD
-				if (geom->GetFacet(i)->counterCache.nbMCHit == 0 && geom->GetFacet(i)->sh.area >= largeAreaThreshold)
+				if (geom->GetFacet(i)->facetHitCache.nbMCHit == 0 && geom->GetFacet(i)->sh.area >= largeAreaThreshold)
 #endif
 					geom->SelectFacet(i);
 			geom->UpdateSelection();
@@ -1494,7 +1537,7 @@ bool Interface::ProcessMessage_shared(GLComponent *src, int message) {
 			UpdateFacetParams(true);
 			return true;
 		case MENU_SELECTION_SELECTFACETNUMBER:
-			if (!selectDialog) selectDialog = new SelectDialog(&worker);
+			if (!selectDialog) selectDialog = new SelectDialog(worker.GetGeometry());
 			selectDialog->SetVisible(true);
 			return true;
 		case MENU_SELECTION_TEXTURETYPE:
@@ -1706,6 +1749,30 @@ bool Interface::ProcessMessage_shared(GLComponent *src, int message) {
 		case MENU_QUICKPIPE:
 			if (AskToSave()) BuildPipe(5.0,5);
 			return true;
+		case MENU_ABOUT:
+		{
+			std::ostringstream aboutText;
+			aboutText << "Program:    " << appName << " " << appVersionName;
+			aboutText << R"(
+Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
+Copyright:   E.S.R.F / CERN   (2018)
+Website:    https://cern.ch/molflow
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+)";
+			GLMessageBox::Display(aboutText.str().c_str(), "About", GLDLG_OK, GLDLG_ICONINFO);
+			return true;
+		}
 		}
 		// Load recent menu
 		if (src->GetId() >= MENU_FILE_LOADRECENT && src->GetId() < MENU_FILE_LOADRECENT + nbRecent) {
@@ -1807,7 +1874,7 @@ bool Interface::ProcessMessage_shared(GLComponent *src, int message) {
 		if (src == facetList && geom->IsLoaded()) {
 			auto selRows = facetList->GetSelectedRows(true);
 			geom->UnselectAll();
-			for (auto sel:selRows)
+			for (auto& sel:selRows)
 				geom->SelectFacet(sel);
 			geom->UpdateSelection();
 			UpdateFacetParams();
@@ -1870,13 +1937,10 @@ bool Interface::ProcessMessage_shared(GLComponent *src, int message) {
 			FrameMove();
 			return true;
 		}
-		else if (src == facetHistogramBtn) {
-			if (!histogramSettings) {
-				histogramSettings = new HistogramSettings();
-				histogramSettings->Refresh(geom->GetSelectedFacets());
-			}
-			histogramSettings->SetVisible(!histogramSettings->IsVisible());
-			histogramSettings->Reposition();
+		else if (src == facetCoordBtn) {
+			if (!facetCoordinates) facetCoordinates = new FacetCoordinates();
+			facetCoordinates->Display(&worker);
+			return true;
 		}
 		break;
 
@@ -2207,7 +2271,7 @@ void Interface::RenumberSelections(const std::vector<int> &newRefs) {
 }
 
 void Interface::RenumberFormulas(std::vector<int> *newRefs) {
-	for (auto f:formulas_n) {
+	for (auto& f:formulas_n) {
 		if (OffsetFormula(f->GetExpression(), NULL, NULL, newRefs)) {
 			f->Parse();
 		}
@@ -2293,7 +2357,7 @@ void Interface::ClearFormulas() {
 	PlaceComponents();
 	*/
 
-	for (auto f : formulas_n)
+	for (auto& f : formulas_n)
 		SAFE_DELETE(f);
 	formulas_n.clear();
 	if (formulaEditor) formulaEditor->Refresh();
@@ -2638,7 +2702,7 @@ void Interface::DoEvents(bool forced)
 
 bool Interface::AskToReset(Worker *work) {
 	if (work == NULL) work = &worker;
-	if (work->nbMCHit > 0) {
+	if (work->globalHitCache.globalHits.hit.nbMCHit > 0) {
 		int rep = GLMessageBox::Display("This will reset simulation data.", "Geometry change", GLDLG_OK | GLDLG_CANCEL, GLDLG_ICONWARNING);
 		if (rep == GLDLG_OK) {
 			work->ResetStatsAndHits(m_fTime);
@@ -2712,18 +2776,18 @@ int Interface::FrameMove()
 				//lastUpdate = GetTick(); //changed from m_fTime: include update duration
 
 				// Update timing measurements
-				if (worker.nbMCHit != lastNbHit || worker.nbDesorption != lastNbDes) {
+				if (worker.globalHitCache.globalHits.hit.nbMCHit != lastNbHit || worker.globalHitCache.globalHits.hit.nbDesorbed != lastNbDes) {
 					double dTime = (double)(m_fTime - lastMeasTime);
-					hps = (double)(worker.nbMCHit - lastNbHit) / dTime;
-					dps = (double)(worker.nbDesorption - lastNbDes) / dTime;
+					hps = (double)(worker.globalHitCache.globalHits.hit.nbMCHit - lastNbHit) / dTime;
+					dps = (double)(worker.globalHitCache.globalHits.hit.nbDesorbed - lastNbDes) / dTime;
 					if (lastHps != 0.0) {
 						hps = 0.2*(hps)+0.8*lastHps;
 						dps = 0.2*(dps)+0.8*lastDps;
 					}
 					lastHps = hps;
 					lastDps = dps;
-					lastNbHit = worker.nbMCHit;
-					lastNbDes = worker.nbDesorption;
+					lastNbHit = worker.globalHitCache.globalHits.hit.nbMCHit;
+					lastNbDes = worker.globalHitCache.globalHits.hit.nbDesorbed;
 					lastMeasTime = m_fTime;
 				}
 			}
@@ -2746,8 +2810,8 @@ int Interface::FrameMove()
 	}
 	else {
 		if (worker.simuTime > 0.0) {
-			hps = (double)(worker.nbMCHit - nbHitStart) / worker.simuTime;
-			dps = (double)(worker.nbDesorption - nbDesStart) / worker.simuTime;
+			hps = (double)(worker.globalHitCache.globalHits.hit.nbMCHit - nbHitStart) / worker.simuTime;
+			dps = (double)(worker.globalHitCache.globalHits.hit.nbDesorbed - nbDesStart) / worker.simuTime;
 		}
 		else {
 			hps = 0.0;
@@ -2781,20 +2845,20 @@ int Interface::FrameMove()
 		}
 	}
 
-	if (worker.nbLeakTotal) {
-		sprintf(tmp, "%g (%.4f%%)", (double)worker.nbLeakTotal, (double)(worker.nbLeakTotal)*100.0 / (double)worker.nbDesorption);
+	if (worker.globalHitCache.nbLeakTotal) {
+		sprintf(tmp, "%g (%.4f%%)", (double)worker.globalHitCache.nbLeakTotal, (double)(worker.globalHitCache.nbLeakTotal)*100.0 / (double)worker.globalHitCache.globalHits.hit.nbDesorbed);
 		leakNumber->SetText(tmp);
 	}
 	else {
 		leakNumber->SetText("None");
 	}
-	resetSimu->SetEnabled(!worker.isRunning&&worker.nbDesorption > 0);
+	resetSimu->SetEnabled(!worker.isRunning&&worker.globalHitCache.globalHits.hit.nbDesorbed > 0);
 
 	if (worker.isRunning) {
 		startSimu->SetText("Pause");
 		//startSimu->SetFontColor(255, 204, 0);
 	}
-	else if (worker.nbMCHit > 0) {
+	else if (worker.globalHitCache.globalHits.hit.nbMCHit > 0) {
 		startSimu->SetText("Resume");
 		//startSimu->SetFontColor(0, 140, 0);
 	}

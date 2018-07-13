@@ -1,3 +1,22 @@
+/*
+Program:     MolFlow+ / Synrad+
+Description: Monte Carlo simulator for ultra-high vacuum and synchrotron radiation
+Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
+Copyright:   E.S.R.F / CERN
+Website:     https://cern.ch/molflow
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+*/
 #pragma once
 #include "Vector.h"
 #include <vector>
@@ -6,6 +25,7 @@
 #include "PugiXML\pugixml.hpp"
 using namespace pugi;
 #include "GLApp/GLToolkit.h"
+#include <cereal/archives/binary.hpp>
 
 #ifdef SYNRAD
 #include "SynradDistributions.h" //material, for Save, etc.
@@ -18,6 +38,7 @@ struct NeighborFacet {
 
 class CellProperties {
 public:
+	//Old C-style array to save memory
 	Vector2d* points;
 	size_t nbPoints;
 	float   area;     // Area of element
@@ -29,7 +50,7 @@ public:
 
 class FacetGroup; //forward declaration as it's the return value of Explode()
 
-class Facet {
+class Facet { //Interface facet
 
 	typedef struct {
 		size_t u;
@@ -50,7 +71,7 @@ public:
 	bool  SetTexture(double width, double height, bool useMesh);
 	void  glVertex2u(double u, double v);
 	bool  BuildMesh();
-	void  BuildMeshList();
+	void  BuildMeshGLList();
 	void  BuildSelElemList();
 	void  UnselectElem();
 	void  SelectElem(size_t u, size_t v, size_t width, size_t height);
@@ -113,14 +134,17 @@ public:
 #endif
 
 
-	size_t      *indices;      // Indices (Reference to geometry vertex)
-	Vector2d *vertices2;    // Vertices (2D plane space, UV coordinates)
-	int     *cellPropertiesIds;      // -1 if full element, -2 if outside polygon, otherwise index in meshvector
+	std::vector<size_t>   indices;      // Indices (Reference to geometry vertex)
+	std::vector<Vector2d> vertices2;    // Vertices (2D plane space, UV coordinates)
+
+	//C-style arrays to save memory (textures can be huge):
+	int      *cellPropertiesIds;      // -1 if full element, -2 if outside polygon, otherwise index in meshvector
 	CellProperties* meshvector;
 	size_t meshvectorsize;
 
 	FacetProperties sh;
-	FacetHitBuffer counterCache;
+	FacetHitBuffer facetHitCache;
+	FacetHistogramBuffer facetHistogramCache; //contains empty vectors when facet doesn't have it
 
 	// Normalized plane equation (ax + by + cz + d = 0)
 	double a;
@@ -139,7 +163,7 @@ public:
 	bool textureError;   // Disable rendering if the texture has an error
 
 						 // GUI stuff
-	bool  *visible;         // Edge visible flag
+	std::vector<bool>  visible;         // Edge visible flag
 	bool   selected;        // Selected flag
 	TEXTURE_SELECTION    selectedElem;    // Selected mesh element
 	GLint  glElem;          // Surface elements boundaries
@@ -166,6 +190,7 @@ public:
 #ifdef SYNRAD
 
 #endif
+	void SerializeForLoader(cereal::BinaryOutputArchive& outputarchive);
 };
 
 class FacetGroup {

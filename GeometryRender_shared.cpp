@@ -1,11 +1,30 @@
+/*
+Program:     MolFlow+ / Synrad+
+Description: Monte Carlo simulator for ultra-high vacuum and synchrotron radiation
+Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
+Copyright:   E.S.R.F / CERN
+Website:     https://cern.ch/molflow
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+*/
 #include "Geometry_shared.h"
 #include "Worker.h"
 #include "GLApp/MathTools.h" //Min max
 #include "GLApp\GLToolkit.h"
-//#include <malloc.h>
 #include <string.h>
 #include <math.h>
 #include "GLApp/GLMatrix.h"
+#include <tuple>
 #ifdef MOLFLOW
 #include "MolFlow.h"
 #include "Interface.h"
@@ -33,7 +52,7 @@ extern SynRad*mApp;
 void Geometry::SelectFacet(size_t facetId) {
 	if (!isLoaded) return;
 	Facet *f = facets[facetId];
-	f->selected = (viewStruct == -1) || (viewStruct == f->sh.superIdx);
+	f->selected = (viewStruct == -1) || (viewStruct == f->sh.superIdx) || (f->sh.superIdx == -1);
 	if (!f->selected) f->UnselectElem();
 	nbSelectedHist = 0;
 	AddToSelectionHist(facetId);
@@ -83,7 +102,7 @@ void Geometry::SelectArea(int x1, int y1, int x2, int y2, bool clear, bool unsel
 			}
 		}
 		Facet *f = facets[i];
-		if (viewStruct == -1 || f->sh.superIdx == viewStruct) {
+		if (viewStruct == -1 || f->sh.superIdx == viewStruct || f->sh.superIdx == -1) {
 
 			size_t nb = facets[i]->sh.nbIndex;
 			bool isInside = true;
@@ -138,15 +157,22 @@ void Geometry::Select(int x, int y, bool clear, bool unselect, bool vertexBound,
 	// TODO: Handle clipped polygon
 
 	// Check intersection of the facet and a "perspective ray"
-	int *allXe = (int *)malloc(sh.nbVertex * sizeof(int));
-	int *allYe = (int *)malloc(sh.nbVertex * sizeof(int));
+	std::vector<int> screenXCoords(sh.nbVertex);
+	std::vector<int> screenYCoords(sh.nbVertex);
 
 	// Transform points to screen coordinates
-	bool *ok = (bool *)malloc(sh.nbVertex * sizeof(bool));
-	bool *onScreen = (bool *)malloc(sh.nbVertex * sizeof(bool));
+	std::vector<bool> ok(sh.nbVertex);
+	std::vector<bool> onScreen(sh.nbVertex);
 	for (i = 0; i < sh.nbVertex; i++) {//here we could speed up by choosing visible vertices only?
-		ok[i] = GLToolkit::Get2DScreenCoord((float)vertices3[i].x, (float)vertices3[i].y, (float)vertices3[i].z, allXe + i, allYe + i);
-		onScreen[i] = (ok[i] && (*(allXe + i) >= 0) && (*(allYe + i) >= 0) && (*(allXe + i) <= width) && (*(allYe + i) <= height));
+		if (auto screenCoords = GLToolkit::Get2DScreenCoord(vertices3[i])) {
+			ok[i] = true;
+			std::tie(screenXCoords[i],screenYCoords[i]) = *screenCoords;
+			onScreen[i] = screenXCoords[i] >= 0 && screenYCoords[i] >= 0 && screenXCoords[i] <= width && screenYCoords[i] <= height;
+		}
+		else {
+			ok[i] = false;
+			//onScreen[i] = false;
+		}
 	}
 
 	// Check facets
@@ -168,29 +194,26 @@ void Geometry::Select(int x, int y, bool clear, bool unselect, bool vertexBound,
 				mApp->SetFacetSearchPrg(true, tmp);
 			}
 		}
-		if (viewStruct == -1 || facets[i]->sh.superIdx == viewStruct) {
+		if (viewStruct == -1 || facets[i]->sh.superIdx == viewStruct || facets[i]->sh.superIdx == -1) {
 
 			clipped = false;
 			hasVertexOnScreen = false;
 			hasSelectedVertex = false;
-			size_t nb = facets[i]->sh.nbIndex;
 			// Build array of 2D points
-			int *xe = (int *)malloc(nb * sizeof(int));
-			int *ye = (int *)malloc(nb * sizeof(int));
-			for (int j = 0; j < nb && !clipped; j++) {
+			std::vector<Vector2d> v(facets[i]->indices.size());
+
+			for (int j = 0; j < facets[i]->indices.size() && !clipped; j++) {
 				size_t idx = facets[i]->indices[j];
 				if (ok[idx]) {
-					xe[j] = allXe[idx];
-					ye[j] = allYe[idx];
+					v[j] = Vector2d((double)screenXCoords[idx],(double)screenYCoords[idx]);
 					if (onScreen[idx]) hasVertexOnScreen = true;
 				}
 				else {
-
 					clipped = true;
 				}
 			}
 			if (vertexBound) { //CAPS LOCK on, select facets onyl with at least one seleted vertex
-				for (size_t j = 0; j < nb && (!hasSelectedVertex); j++) {
+				for (size_t j = 0; j < facets[i]->indices.size() && (!hasSelectedVertex); j++) {
 					size_t idx = facets[i]->indices[j];
 					if (vertices3[idx].selected) hasSelectedVertex = true;
 				}
@@ -198,9 +221,7 @@ void Geometry::Select(int x, int y, bool clear, bool unselect, bool vertexBound,
 
 			if (!clipped && hasVertexOnScreen && (!vertexBound || hasSelectedVertex)) {
 
-				found = GLToolkit::IsInsidePoly(x, y, xe, ye, nb);
-				free(xe);
-				free(ye);
+				found = IsInPoly(Vector2d((double)x,(double)y), v);
 
 				if (found) {
 					if (unselect) {
@@ -213,7 +234,7 @@ void Geometry::Select(int x, int y, bool clear, bool unselect, bool vertexBound,
 							std::vector<size_t> connectedFacets;
 							mApp->SetFacetSearchPrg(true, "Smart selecting...");
 							if (maxAngleDiff >= 0.0) connectedFacets = GetConnectedFacets(i, maxAngleDiff);
-							for (auto ind : connectedFacets)
+							for (auto& ind : connectedFacets)
 								facets[ind]->selected = false;
 							mApp->SetFacetSearchPrg(false, "");
 						}
@@ -258,7 +279,7 @@ void Geometry::Select(int x, int y, bool clear, bool unselect, bool vertexBound,
 				std::vector<size_t> connectedFacets;
 				mApp->SetFacetSearchPrg(true, "Smart selecting...");
 				if (maxAngleDiff >= 0.0) connectedFacets = GetConnectedFacets(i, maxAngleDiff);
-				for (auto ind : connectedFacets)
+				for (auto& ind : connectedFacets)
 					facets[ind]->selected = !unselect;
 				mApp->SetFacetSearchPrg(false, "");
 			}
@@ -269,17 +290,12 @@ void Geometry::Select(int x, int y, bool clear, bool unselect, bool vertexBound,
 			nbSelectedHist = 0;
 		}
 	}
-
-	free(allXe);
-	free(allYe);
-	free(ok);
-	free(onScreen);
 	UpdateSelection();
 
 }
 
 void Geometry::SelectVertex(int vertexId) {
-	//isVertexSelected[vertexId] = (viewStruct==-1) || (viewStruct==f->sh.superIdx);
+	//isVertexSelected[vertexId] = (viewStruct==-1) || (viewStruct==f->wp.superIdx);
 	//here we should look through facets if vertex is member of any
 	//if( !f->selected ) f->UnselectElem();
 	if (!isLoaded) return;
@@ -326,7 +342,7 @@ void Geometry::SelectVertex(int x1, int y1, int x2, int y2, bool shiftDown, bool
 	for (int i = 0; i < sh.nbVertex; i++) {
 		if (facetBound && !selectedFacetsVertices[i]) continue; //doesn't belong to selected facet
 		Vector3d *v = GetVertex(i);
-		//if(viewStruct==-1 || f->sh.superIdx==viewStruct) {
+		//if(viewStruct==-1 || f->wp.superIdx==viewStruct) {
 		if (true) {
 
 			bool isInside;
@@ -371,17 +387,23 @@ void Geometry::SelectVertex(int x, int y, bool shiftDown, bool ctrlDown, bool fa
 	// TODO: Handle clipped polygon
 
 	// Check intersection of the facet and a "perspective ray"
-	int *allXe = (int *)malloc(sh.nbVertex * sizeof(int));
-	int *allYe = (int *)malloc(sh.nbVertex * sizeof(int));
+	std::vector<int> allXe(sh.nbVertex);
+	std::vector<int> allYe(sh.nbVertex);
+	std::vector<bool> ok(sh.nbVertex);
 
 	std::vector<bool> selectedFacetsVertices;
 	if (facetBound) selectedFacetsVertices = GetVertexBelongsToSelectedFacet();
 
 	// Transform points to screen coordinates
-	bool *ok = (bool *)malloc(sh.nbVertex * sizeof(bool));
 	for (i = 0; i < sh.nbVertex; i++) {
 		if (facetBound && !selectedFacetsVertices[i]) continue; //doesn't belong to selected facet
-		ok[i] = GLToolkit::Get2DScreenCoord((float)vertices3[i].x, (float)vertices3[i].y, (float)vertices3[i].z, allXe + i, allYe + i);
+		if (auto screenCoords = GLToolkit::Get2DScreenCoord(vertices3[i])) {
+			ok[i] = true;
+			std::tie(allXe[i], allYe[i]) = *screenCoords;
+		}
+		else {
+			ok[i] = false;
+		}
 	}
 
 	//Get Closest Point to click
@@ -414,9 +436,6 @@ void Geometry::SelectVertex(int x, int y, bool shiftDown, bool ctrlDown, bool fa
 		}
 	}
 
-	free(allXe);
-	free(allYe);
-	free(ok);
 	//UpdateSelection();
 	if (mApp->vertexCoordinates) mApp->vertexCoordinates->Update();
 }
@@ -566,27 +585,22 @@ void Geometry::DrawFacet(Facet *f, bool offset, bool showHidden, bool selOffset)
 
 void Geometry::DrawPolys() {
 
-	size_t *f3 = (size_t *)malloc(sh.nbFacet * sizeof(size_t));
-	size_t *f4 = (size_t *)malloc(sh.nbFacet * sizeof(size_t));
-	size_t *fp = (size_t *)malloc(sh.nbFacet * sizeof(size_t));
-	size_t nbF3 = 0;
-	size_t nbF4 = 0;
-	size_t nbFP = 0;
+	std::vector<size_t> f3; f3.reserve(sh.nbFacet);
+	std::vector<size_t> f4; f4.reserve(sh.nbFacet);
+	std::vector<size_t> fp; fp.reserve(sh.nbFacet);
 
 	// Group TRI,QUAD and POLY
 	for (size_t i = 0; i < sh.nbFacet; i++) {
 		size_t nb = facets[i]->sh.nbIndex;
 		if (facets[i]->volumeVisible) {
 			if (nb == 3) {
-				f3[nbF3++] = i;
+				f3.push_back(i);
 			}
 			else if (nb == 4) {
-
-				f4[nbF4++] = i;
+				f4.push_back(i);
 			}
 			else {
-
-				fp[nbFP++] = i;
+				fp.push_back(i);
 			}
 		}
 	}
@@ -595,27 +609,22 @@ void Geometry::DrawPolys() {
 	glBegin(GL_TRIANGLES);
 
 	// Triangle
-	for (size_t i = 0; i < nbF3; i++)
-		FillFacet(facets[f3[i]], false);
+	for (const auto& i : f3)
+		FillFacet(facets[i], false);
 
 	// Triangulate polygon
-	for (size_t i = 0; i < nbFP; i++)
-		Triangulate(facets[fp[i]], false);
+	for (const auto& i : fp)
+		Triangulate(facets[i], false);
 
 	glEnd();
 
 	// Quads
 	glBegin(GL_QUADS);
-	for (size_t i = 0; i < nbF4; i++)
-		FillFacet(facets[f4[i]], false);
+	for (const auto& i : f4)
+		FillFacet(facets[i], false);
 	glEnd();
 
-	free(f3);
-	free(f4);
-	free(fp);
-
 }
-
 void Geometry::SetCullMode(int mode) {
 
 	switch (mode) {
@@ -762,11 +771,11 @@ void Geometry::RenderArrow(GLfloat *matView, float dx, float dy, float dz, float
 
 // Triangulation stuff
 
-int Geometry::FindEar(POLYGON *p) {
+int Geometry::FindEar(const GLAppPolygon& p) {
 
 	int i = 0;
 	bool earFound = false;
-	while (i < p->nbPts && !earFound) {
+	while (i < p.pts.size() && !earFound) {
 		if (IsConvex(p, i))
 			earFound = !ContainsConcave(p, i - 1, i, i + 1);
 		if (!earFound) i++;
@@ -782,7 +791,7 @@ int Geometry::FindEar(POLYGON *p) {
 
 }
 
-void Geometry::AddTextureCoord(Facet *f, Vector2d *p) {
+void Geometry::AddTextureCoord(Facet *f, const Vector2d *p) {
 
 	// Add texture coord with a 1 texel border (for bilinear filtering)
 	double uStep = 1.0 / (double)f->texDimW;
@@ -810,16 +819,16 @@ void Geometry::FillFacet(Facet *f, bool addTextureCoord) {
 	size_t i;
 	if (mApp->leftHandedView) {
 			i = 0;
-			glNormal3d(-f->sh.N.x, -f->sh.N.y, -f->sh.N.z);
+			glNormal3d(-f->wp.N.x, -f->wp.N.y, -f->wp.N.z);
 	}
 	else {
-			i = f->sh.nbIndex-1;
-			glNormal3d(f->sh.N.x, f->sh.N.y, f->sh.N.z);
+			i = f->wp.nbIndex-1;
+			glNormal3d(f->wp.N.x, f->wp.N.y, f->wp.N.z);
 	}
-	for (; nbDrawn < f->sh.nbIndex; nbDrawn++) {*/
+	for (; nbDrawn < f->wp.nbIndex; nbDrawn++) {*/
 	for (size_t i=0;i<f->sh.nbIndex;i++) {
 		size_t idx = f->indices[i];
-		if (addTextureCoord) AddTextureCoord(f, f->vertices2 + i);
+		if (addTextureCoord) AddTextureCoord(f, &(f->vertices2[i]));
 		glVertex3d(vertices3[idx].x, vertices3[idx].y, vertices3[idx].z);
 		/*if (mApp->leftHandedView) {
 			i++;
@@ -830,27 +839,27 @@ void Geometry::FillFacet(Facet *f, bool addTextureCoord) {
 	}
 }
 
-void Geometry::DrawEar(Facet *f, POLYGON *p, int ear, bool addTextureCoord) {
+void Geometry::DrawEar(Facet *f, const GLAppPolygon& p, int ear, bool addTextureCoord) {
 
 	//Commented out sections: theoretically in a right-handed system the vertex order is inverse
 	//However we'll solve it simpler by inverting the geometry viewer Front/back culling mode setting
 
 	Vector3d  p3D;
-	Vector2d *p1;
-	Vector2d *p2;
-	Vector2d *p3;
+	const Vector2d* p1;
+	const Vector2d* p2;
+	const Vector2d* p3;
 
 	// Follow orientation
 	/*double handedness = mApp->leftHandedView ? 1.0 : -1.0;*/
-	if (/*handedness * */ p->sign > 0.0) {
-		p1 = &(p->pts[Previous(ear, p->nbPts)]);
-		p2 = &(p->pts[Next(ear, p->nbPts)]);
-		p3 = &(p->pts[IDX(ear, p->nbPts)]);
+	if (/*handedness * */ p.sign > 0.0) {
+		p1 = &(p.pts[Previous(ear, p.pts.size())]);
+		p2 = &(p.pts[Next(ear, p.pts.size())]);
+		p3 = &(p.pts[IDX(ear, p.pts.size())]);
 	}
 	else {
-		p1 = &(p->pts[Previous(ear, p->nbPts)]);
-		p2 = &(p->pts[IDX(ear, p->nbPts)]);
-		p3 = &(p->pts[Next(ear, p->nbPts)]);
+		p1 = &(p.pts[Previous(ear, p.pts.size())]);
+		p2 = &(p.pts[IDX(ear, p.pts.size())]);
+		p3 = &(p.pts[Next(ear, p.pts.size())]);
 	}
 
 	glNormal3d(-f->sh.N.x, -f->sh.N.y, -f->sh.N.z);
@@ -861,7 +870,7 @@ void Geometry::DrawEar(Facet *f, POLYGON *p, int ear, bool addTextureCoord) {
 	p3D.z = f->sh.O.z + p1->u*f->sh.U.z + p1->v*f->sh.V.z;
 	glVertex3d(p3D.x, p3D.y, p3D.z);
 
-	//glNormal3d(-f->sh.N.x, -f->sh.N.y, -f->sh.N.z);
+	//glNormal3d(-f->wp.N.x, -f->wp.N.y, -f->wp.N.z);
 	if (addTextureCoord) AddTextureCoord(f, p2);
 	// (U,V) -> (x,y,z)
 	p3D.x = f->sh.O.x + p2->u*f->sh.U.x + p2->v*f->sh.V.x;
@@ -869,7 +878,7 @@ void Geometry::DrawEar(Facet *f, POLYGON *p, int ear, bool addTextureCoord) {
 	p3D.z = f->sh.O.z + p2->u*f->sh.U.z + p2->v*f->sh.V.z;
 	glVertex3d(p3D.x, p3D.y, p3D.z);
 
-	//glNormal3d(-f->sh.N.x, -f->sh.N.y, -f->sh.N.z);
+	//glNormal3d(-f->wp.N.x, -f->wp.N.y, -f->wp.N.z);
 	if (addTextureCoord) AddTextureCoord(f, p3);
 	// (U,V) -> (x,y,z)
 	p3D.x = f->sh.O.x + p3->u*f->sh.U.x + p3->v*f->sh.V.x;
@@ -885,33 +894,27 @@ void Geometry::Triangulate(Facet *f, bool addTextureCoord) {
 	// The facet must have at least 3 points
 	// Use the very simple "Two-Ears" theorem. It computes in O(n^2).
 
-	// Build a POLYGON
-	POLYGON p;
-	p.nbPts = f->sh.nbIndex;
-	p.pts = (Vector2d *)malloc(p.nbPts * sizeof(Vector2d));
-	memcpy(p.pts, f->vertices2, p.nbPts * sizeof(Vector2d));
-	p.sign = f->sh.sign;
-
 	if (f->sh.sign == 0.0) {
 		// Not a simple polygon
 		// Abort triangulation
-		free(p.pts);
 		return;
 	}
 
+	// Build a Polygon
+	GLAppPolygon p;
+	p.pts = f->vertices2;
+	p.sign = f->sh.sign;
+	
 	// Perform triangulation
-	while (p.nbPts > 3) {
-		int e = FindEar(&p);
-		DrawEar(f, &p, e, addTextureCoord);
+	while (p.pts.size() > 3) {
+		int e = FindEar(p);
+		DrawEar(f, p, e, addTextureCoord);
 		// Remove the ear
-		for (int i = e; i < p.nbPts - 1; i++)
-			p.pts[i] = p.pts[i + 1];
-		p.nbPts--; //Underrun-safe
+		p.pts.erase(p.pts.begin() + e);
 	}
 
 	// Draw the last ear
-	DrawEar(f, &p, 0, addTextureCoord);
-	free(p.pts);
+	DrawEar(f, p, 0, addTextureCoord);
 
 }
 
@@ -1041,7 +1044,7 @@ void Geometry::Render(GLfloat *matView, bool renderVolume, bool renderTexture, i
 
 			Facet *f = facets[i];
 			if (f->cellPropertiesIds  && f->textureVisible) {
-				if (!f->glElem) f->BuildMeshList();
+				if (!f->glElem) f->BuildMeshGLList();
 
 				glEnable(GL_POLYGON_OFFSET_LINE);
 				glPolygonOffset(1.0f, 2.0f);
@@ -1135,7 +1138,7 @@ void Geometry::DeleteGLLists(bool deletePoly, bool deleteLine) {
 std::vector<bool> Geometry::GetVertexBelongsToSelectedFacet() {
 	std::vector<bool> result(sh.nbVertex, false);
 	std::vector<size_t> selFacetIds = GetSelectedFacets();
-	for (auto facetId : selFacetIds) {
+	for (auto& facetId : selFacetIds) {
 		Facet* f = facets[facetId];
 		for (size_t i = 0; i < f->sh.nbIndex; i++)
 			result[f->indices[i]] = true;
@@ -1285,7 +1288,7 @@ void Geometry::BuildSelectList() {
 	}
 	glLineWidth(2.0f);
 
-	for(int i=0;i<sh.nbFacet;i++ ) {
+	for(int i=0;i<wp.nbFacet;i++ ) {
 	Facet *f = facets[i];
 	if( f->selected ) {
 	//DrawFacet(f,false);
@@ -1316,7 +1319,7 @@ void Geometry::BuildSelectList() {
 	}
 	glLineWidth(2.0f);
 
-	for(int i=0;i<sh.nbFacet;i++ ) {
+	for(int i=0;i<wp.nbFacet;i++ ) {
 	Facet *f = facets[i];
 	if( f->selected )
 	{
@@ -1347,7 +1350,7 @@ void Geometry::BuildSelectList() {
 	glLineWidth(2.0f);
 
 	auto selectedFacets = GetSelectedFacets();
-	for (auto sel : selectedFacets) {
+	for (auto& sel : selectedFacets) {
 		Facet *f = facets[sel];
 		//DrawFacet(f,false,true,true);
 		DrawFacet(f, false, true, false); //Faster than true true true, without noticeable glitches
@@ -1375,7 +1378,7 @@ void Geometry::BuildGLList() {
 		lineList[j] = glGenLists(1);
 		glNewList(lineList[j], GL_COMPILE);
 		for (int i = 0; i < sh.nbFacet; i++) {
-			if (facets[i]->sh.superIdx == j)
+			if (facets[i]->sh.superIdx == j || facets[i]->sh.superIdx == -1)
 				DrawFacet(facets[i], false, true, false);
 		}
 		glEndList();

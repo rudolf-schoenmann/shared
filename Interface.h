@@ -1,3 +1,22 @@
+/*
+Program:     MolFlow+ / Synrad+
+Description: Monte Carlo simulator for ultra-high vacuum and synchrotron radiation
+Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
+Copyright:   E.S.R.F / CERN
+Website:     https://cern.ch/molflow
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+*/
 #pragma once
 
 //Shared functions of the Molflow and Synrad interface
@@ -23,6 +42,7 @@ class GLMenu;
 class GeometryViewer;
 class CollapseSettings;
 class HistogramSettings;
+class HistogramPlotter;
 class MoveVertex;
 class ScaleVertex;
 class ScaleFacet;
@@ -135,7 +155,9 @@ typedef struct {
 #define MENU_TOOLS_TEXPLOTTER  401
 #define MENU_TOOLS_PROFPLOTTER 402
 #define MENU_TOOLS_PARTICLELOGGER 403
-#define MENU_TOOLS_SCREENSHOT 404
+#define MENU_TOOLS_HISTOGRAMSETTINGS 404
+#define MENU_TOOLS_HISTOGRAMPLOTTER 405
+#define MENU_TOOLS_SCREENSHOT 406
 
 #define MENU_SELECTION_ADDNEW             501
 #define MENU_SELECTION_CLEARALL           502
@@ -185,6 +207,8 @@ typedef struct {
 #define MENU_TEST_PIPE10000       806
 
 #define MENU_QUICKPIPE            810
+
+#define MENU_ABOUT                1000
 
 static const GLfloat position[] = { -0.3f, 0.3f, -1.0f, 0.0f }; //light1
 static const GLfloat positionI[] = { 1.0f,-0.5f,  -0.2f, 0.0f }; //light2
@@ -288,7 +312,7 @@ public:
 
 	GLButton      *facetApplyBtn;
 	GLButton      *facetDetailsBtn;
-	GLButton      *facetHistogramBtn;
+	GLButton      *facetCoordBtn;
 	GLButton      *facetAdvParamsBtn; // <<Adv, used by Molflow only
 	GLTitledPanel *facetPanel;
 	GLList        *facetList;
@@ -366,6 +390,7 @@ public:
 	//Dialog
 	CollapseSettings   *collapseSettings;
 	HistogramSettings  *histogramSettings;
+	HistogramPlotter   *histogramPlotter;
 	MoveVertex		   *moveVertex;
 	ScaleFacet         *scaleFacet;
 	ScaleVertex        *scaleVertex;

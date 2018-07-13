@@ -1,18 +1,4 @@
-/*
-File:        GLList.cpp
-Description: Scrolled list class (SDL/OpenGL OpenGL application framework)
-Author:      J-L PONS (2007)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-*/
+// Copyright (c) 2011 rubicon IT GmbH
 #include "GLWindow.h"
 #include "GLComponent.h"
 #include "GLScrollBar.h"
@@ -693,7 +679,7 @@ std::vector<size_t> GLList::GetSelectedRows(bool searchIndex) {
 	if (!searchIndex) return selectedRows;
 	else {
 		std::vector<size_t> ret;
-		for (auto sel:selectedRows)
+		for (auto& sel:selectedRows)
 			ret.push_back(GetValueInt(sel,0)-1);
 		return ret;
 	}
@@ -730,7 +716,7 @@ void GLList::AddSelectedRow(int row,bool searchIndex) {
 void GLList::SetSelectedRows(std::vector<size_t> selection,bool searchIndex) {
 	if (searchIndex) {
 		selectedRows.clear();
-		for (auto sel : selection)
+		for (auto& sel : selection)
 			selectedRows.push_back((size_t)FindIndex(sel, 0));
 	}
 	else
@@ -846,7 +832,7 @@ void GLList::Paint() {
 
 	case SINGLE_ROW:
 	case MULTIPLE_ROW:
-		for(auto sel:selectedRows) {
+		for(auto& sel:selectedRows) {
 			if( (sel+1)*cHeight>=sY && sel*cHeight<=sY+_height ) {
 				int mu=(showCLabel?labHeight:1);
 				GetWindow()->Clip(this,1+labW,mu,(sbWidth?sbWidth:1),Min(mb,this->GetHeight()-mu-1)); //maintain minimum height to avoid SetViewPort error
@@ -1269,7 +1255,7 @@ void GLList::UpdateCell() {
 
 	if( cEdits[selectedCol]==EDIT_NUMBER ) {
 		double val;
-		if( sscanf(edit->GetText(),"%lf",&val)<=0 ) {
+		if( !edit->GetNumber(&val) ) {
 			if( cNames ) {
 				sprintf(tmp,"Wrong number format at line %zd (%s)",selectedRows[0]+1,cNames[selectedCol]);
 			} else {
@@ -1281,7 +1267,7 @@ void GLList::UpdateCell() {
 			SetValueAt(selectedCol,selectedRows[0],tmp);
 		}
 	} else {
-		SetValueAt(selectedCol,selectedRows[0],edit->GetText());
+		SetValueAt(selectedCol,selectedRows[0],edit->GetText().c_str());
 	}
 
 }
@@ -1727,7 +1713,7 @@ void GLList::ManageEvent(SDL_Event *evt) {
 						}
 
 						std::vector<size_t> selFacetIds;
-						for (auto sel:selectedRows)
+						for (auto& sel:selectedRows)
 							selFacetIds.push_back(GetValueInt(sel,0)-1);
 
 						std::qsort(table, nbRow,sizeof(SORTVAR*), cmp_column<SORTVAR>);

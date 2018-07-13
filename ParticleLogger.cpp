@@ -1,3 +1,22 @@
+/*
+Program:     MolFlow+ / Synrad+
+Description: Monte Carlo simulator for ultra-high vacuum and synchrotron radiation
+Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
+Copyright:   E.S.R.F / CERN
+Website:     https://cern.ch/molflow
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+*/
 #include "ParticleLogger.h"
 #include "GLApp/GLTitledPanel.h"
 #include "GLApp/GLToolkit.h"
@@ -139,9 +158,8 @@ void ParticleLogger::ProcessMessage(GLComponent *src, int message) {
 			}
 			else if (src == exportButton) {
 				//Export to CSV
-				size_t nbRec;
-				ParticleLoggerItem* logBuff;
-				std::tie(nbRec, logBuff) = work->GetLogBuff();
+				
+				auto[nbRec, logBuff] = work->GetLogBuff();
 				FILENAME *fn = GLFileBox::SaveFile(NULL, NULL, NULL, "All files\0*.*\0", NULL);
 				if (fn) {
 					bool ok = true;
@@ -164,9 +182,7 @@ void ParticleLogger::ProcessMessage(GLComponent *src, int message) {
 			}
 			else if (src == copyButton) {
 				//Copy to clipboard
-				size_t nbRec;
-				ParticleLoggerItem* logBuff;
-				std::tie(nbRec, logBuff) = work->GetLogBuff();
+				auto[nbRec, logBuff] = work->GetLogBuff();
 				copyButton->SetText("Abort");
 				isRunning = true;
 				std::string clipBoardText = ConvertLogToText(nbRec, logBuff, "\t");
@@ -208,9 +224,7 @@ void ParticleLogger::UpdateMemoryEstimate() {
 
 void ParticleLogger::UpdateStatus() {
 
-	size_t nbRec;
-	void* logBuff;
-	std::tie(nbRec, logBuff) = work->GetLogBuff();
+	auto[nbRec, logBuff] = work->GetLogBuff();
 	work->ReleaseLogBuff();
 
 	if (nbRec == 0) {

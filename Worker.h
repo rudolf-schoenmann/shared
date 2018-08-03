@@ -77,6 +77,8 @@ public:
   std::vector<std::vector<std::string>> ImportCSV_string(FileReader *file);
   std::vector<std::vector<double>> ImportCSV_double(FileReader *file);
 
+  void ExportBuffer();
+
   // Return/Set the current filename
   char *GetCurrentFileName();
   char *GetCurrentShortFileName();

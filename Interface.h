@@ -216,6 +216,7 @@ static const GLfloat positionI[] = { 1.0f,-0.5f,  -0.2f, 0.0f }; //light2
 static const char *fileSelFilters = "Selection files\0*.sel\0All files\0*.*\0";
 static const char *fileTexFilters = "Text files\0*.txt\0All files\0*.*\0";
 static const char *fileProfFilters = "CSV file\0*.csv\0Text files\0*.txt\0All files\0*.*\0";
+static const char *fileBufferFilters = "All files\0*.*\0";
 
 class AppUpdater;
 

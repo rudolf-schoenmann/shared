@@ -77,6 +77,9 @@ public:
   std::vector<std::vector<std::string>> ImportCSV_string(FileReader *file);
   std::vector<std::vector<double>> ImportCSV_double(FileReader *file);
 
+  void ExportHitBuffer(char *fileName); //new function to export hit buffer for simulation on Linux HPC, added by Rudi.
+  void ExportLoadBuffer(char *fileName); //new function to export load buffer for simulation on Linux HPC, added by Rudi.
+
   // Return/Set the current filename
   char *GetCurrentFileName();
   char *GetCurrentShortFileName();
@@ -227,6 +230,7 @@ private:
   Dataport *dpControl;
   Dataport *dpHit;
   Dataport *dpLog;
+  //Dataport *loader; //(Rudi) added for the ExportLoadBuffer function
 
   char      ctrlDpName[32];
   char      loadDpName[32];

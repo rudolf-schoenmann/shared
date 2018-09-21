@@ -231,7 +231,7 @@ private:
   Dataport *dpControl;
   Dataport *dpHit;
   Dataport *dpLog;
-  //Dataport *loader; //(Rudi) added for the ExportLoadBuffer function
+
 
   char      ctrlDpName[32];
   char      loadDpName[32];

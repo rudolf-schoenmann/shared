@@ -755,9 +755,7 @@ void Interface::OneTimeSceneInit_shared_pre() {
 	menu->GetSubMenu("File")->SetIcon(MENU_FILE_SAVEAS, 101, 24);
 	menu->GetSubMenu("File")->SetIcon(MENU_FILE_LOAD, 65, 24);//65,24
 	//menu->GetSubMenu("File")->SetIcon(MENU_FILE_LOADRECENT,83,24);//83,24
-	menu->GetSubMenu("File")->Add("&Import buffer");
-	menu->GetSubMenu("File")->GetSubMenu("Import buffer")->Add("&Import hit buffer", MENU_FILE_IMPORTBUFFER_HIT);
-
+	
 	menu->Add("Selection");
 	menu->GetSubMenu("Selection")->Add("Smart Select facets...", MENU_SELECTION_SMARTSELECTION, SDLK_s, ALT_MODIFIER);
 	menu->GetSubMenu("Selection")->Add(NULL); // Separator

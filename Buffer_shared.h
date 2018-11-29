@@ -112,6 +112,7 @@ public:
 	double sticking;       // Sticking (0=>reflection  , 1=>absorption)   - can be overridden by time-dependent parameter
 	double opacity;        // opacity  (0=>transparent , 1=>opaque)
 	double area;           // Facet area (m^2)
+	//double covering;
 
 	int    profileType;    // Profile type
 	int    superIdx;       // Super structure index (Indexed from 0) -1: facet belongs to all structures (typically counter facets)
@@ -498,6 +499,7 @@ typedef union {
 		double sum_1_per_ort_velocity;    // sum of reciprocials of orthogonal velocity components, used to determine the density, regardless of facet orientation
 		double sum_1_per_velocity;          //For average molecule speed calculation
 		double sum_v_ort;          // sum of orthogonal speeds of incident velocities, used to determine the pressure
+		double covering; //new counter for covering
 	} hit;
 
 	struct {
@@ -511,13 +513,14 @@ typedef union {
 	void serialize(Archive & archive)
 	{
 		archive(
-			CEREAL_NVP(nbDesorbed),
-			CEREAL_NVP(nbMCHit),
-			CEREAL_NVP(nbHitEquiv),
-			CEREAL_NVP(nbAbsEquiv),
-			CEREAL_NVP(sum_1_per_ort_velocity),
-			CEREAL_NVP(sum_1_per_velocity),
-			CEREAL_NVP(sum_v_ort)
+			CEREAL_NVP(hit.nbDesorbed),
+			CEREAL_NVP(hit.nbMCHit),
+			CEREAL_NVP(hit.nbHitEquiv),
+			CEREAL_NVP(hit.nbAbsEquiv),
+			CEREAL_NVP(hit.sum_1_per_ort_velocity),
+			CEREAL_NVP(hit.sum_1_per_velocity),
+			CEREAL_NVP(hit.sum_v_ort),
+			CEREAL_NVP(hit.covering)
 			);
 	}
 } FacetHitBuffer;

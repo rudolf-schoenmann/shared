@@ -511,6 +511,11 @@ void Interface::UpdateModelParams() {
 	facetList->SetSize(cSize, geom->GetNbFacet(), false, true);
 	facetList->SetColumnWidths((int*)cWidth);
 	facetList->SetColumnLabels((char **)cName);
+	/*
+	historyList->SetSize(geom->GetNbFacet()+1, 1, false, true);
+	historyList->AutoSizeColumn();
+	historyList->SetColumnLabels();*/
+
 	UpdateFacetHits(true);
 	UpdateFacetlistSelected();
 	AxisAlignedBoundingBox bb = geom->GetBB();

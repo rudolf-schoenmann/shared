@@ -384,6 +384,10 @@ void Worker::ResetStatsAndHits(float appTime) {
 		return;
 
 	try {
+		if (mApp->history != NULL) {
+			mApp->history->SetVisible(false);
+			SAFE_DELETE(mApp->history)
+		}
 		ResetWorkerStats();
 		if (!ExecuteAndWait(COMMAND_RESET, PROCESS_READY))
 			ThrowSubProcError();

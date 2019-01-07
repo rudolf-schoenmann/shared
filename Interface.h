@@ -319,6 +319,7 @@ public:
 	GLButton      *facetAdvParamsBtn; // <<Adv, used by Molflow only
 	GLTitledPanel *facetPanel;
 	GLList        *facetList;
+	//GLList        *historyList;
 	GLLabel       *facetSideLabel;
 	GLTitledPanel *togglePanel;
 	GLCombo       *facetSideType;

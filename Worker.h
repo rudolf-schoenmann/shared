@@ -24,10 +24,12 @@ Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 #include "GLApp/GLTypes.h"
 #include "Smp.h"
 #include "Buffer_shared.h" //LEAK, HIT
+#include "HistoryWin.h"
 
 class Geometry;
 class GLProgress;
 class LoadStatus;
+class HistoryWin;
 
 
 #ifdef MOLFLOW

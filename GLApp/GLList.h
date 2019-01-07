@@ -44,6 +44,7 @@ public:
   void SetWorker(Worker *w);
   void SetSize(size_t nbColumn,size_t nbRow,bool keepData=false,bool showProgress=false);
   void SetColumnLabels(char **names);
+  void SetColumnLabels();
   void SetColumnLabel(size_t colId,char *name);
   void SetAutoColumnLabel(bool enable);
   void SetColumnLabelVisible(bool visible);

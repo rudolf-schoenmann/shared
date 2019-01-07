@@ -418,6 +418,17 @@ void GLList::SetColumnLabels(char **names) {
 	}
 }
 
+void GLList::SetColumnLabels() {
+	if (cNames) {
+		cNames[0]= _strdup("time");
+		for (int i = 1;i < nbCol;i++) {
+			SAFE_FREE(cNames[i]);
+			char c= i + '0';
+			cNames[i] = _strdup(&c);
+		}
+	}
+}
+
 void GLList::SetRowLabels(char **names) {
 
 	if(rNames) {

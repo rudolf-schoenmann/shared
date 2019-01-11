@@ -82,7 +82,7 @@ public:
   void ExportHitBuffer(char *fileName); //new function to export hit buffer for simulation on Linux HPC, added by Rudi.
   void ExportLoadBuffer(char *fileName); //new function to export load buffer for simulation on Linux HPC, added by Rudi.
   void ImportHitBuffer(char *fileName); //new function to import hit buffer for simulation on Linux HPC, added by Rudi.
-  void UpdateCoveringInHitBuffer(double covering); //new function to import hit buffer for simulation on Linux HPC, added by Rudi.
+
   // Return/Set the current filename
   char *GetCurrentFileName();
   char *GetCurrentShortFileName();

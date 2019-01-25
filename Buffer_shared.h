@@ -112,7 +112,7 @@ public:
 	double sticking;       // Sticking (0=>reflection  , 1=>absorption)   - can be overridden by time-dependent parameter
 	double opacity;        // opacity  (0=>transparent , 1=>opaque)
 	double area;           // Facet area (m^2)
-	//double covering;		// Impurity covering.  covering == 1 means monolayer
+	//double covering;		// Impurity covering.  covering == 1 means one particle on the facet
 
 	int    profileType;    // Profile type
 	int    superIdx;       // Super structure index (Indexed from 0) -1: facet belongs to all structures (typically counter facets)
@@ -476,6 +476,7 @@ public:
 	std::vector<double> nbHitsHistogram;
 	std::vector<double> distanceHistogram;
 	std::vector<double> timeHistogram;
+	//Sollen wir auch ein coveringHistogram machen?
 	template<class Archive>
 	void serialize(Archive & archive)
 	{
@@ -499,7 +500,7 @@ typedef union {
 		double sum_1_per_ort_velocity;    // sum of reciprocials of orthogonal velocity components, used to determine the density, regardless of facet orientation
 		double sum_1_per_velocity;          //For average molecule speed calculation
 		double sum_v_ort;          // sum of orthogonal speeds of incident velocities, used to determine the pressure
-		double covering; //new counter for covering
+		llong covering; //new counter for covering
 	} hit;
 
 	struct {

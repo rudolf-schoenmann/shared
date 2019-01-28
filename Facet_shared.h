@@ -185,7 +185,7 @@ public:
 	std::string userOutgassing;
 	std::string userSticking;
 	std::string userOpacity;
-	std::string usercovering;
+	std::string usercoverage;
 #endif
 
 #ifdef SYNRAD

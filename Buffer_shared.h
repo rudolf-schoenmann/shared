@@ -111,7 +111,7 @@ public:
 	//For sync between interface and subprocess
 	double sticking;       // Sticking (0=>reflection  , 1=>absorption)   - can be overridden by time-dependent parameter
 	double opacity;        // opacity  (0=>transparent , 1=>opaque)
-	double area;           // Facet area (m^2)
+	double area;           // Facet area (m^2) //Is this really in m^2?
 	//double covering;		// Impurity covering.  
 
 	int    profileType;    // Profile type

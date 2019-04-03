@@ -186,6 +186,8 @@ public:
 	std::string userSticking;
 	std::string userOpacity;
 	std::string usercoverage;
+	std::string usercovering;
+	std::string userdesorption;
 #endif
 
 #ifdef SYNRAD

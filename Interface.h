@@ -219,7 +219,7 @@ static const char *fileTexFilters = "Text files\0*.txt\0All files\0*.*\0";
 static const char *fileProfFilters = "CSV file\0*.csv\0Text files\0*.txt\0All files\0*.*\0";
 static const char *fileBufferFilters = "All files\0*.*\0";
 
-class AppUpdater;
+//class AppUpdater;
 
 class Interface : public GLApplication {
 protected:
@@ -266,7 +266,7 @@ public:
 	double   largeAreaThreshold; //Selection filter
 	double   planarityThreshold; //Planarity threshold
 	
-	AppUpdater* appUpdater;
+	//AppUpdater* appUpdater;
 
 	int      autoUpdateFormulas;
 	int      compressSavedFiles;

@@ -110,7 +110,7 @@ if (appUpdater && appUpdater->IsUpdateAvailable()) {
 
 
 */
-
+/*
 #pragma once
 #include <string>
 #include <vector>
@@ -238,4 +238,4 @@ private:
 	GLLabel *questionLabel;
 	GLButton *allowButton, *declineButton, *laterButton, *privacyButton;
 	AppUpdater* updater;
-};
+};*/

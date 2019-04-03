@@ -17,6 +17,7 @@ GNU General Public License for more details.
 
 Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 */
+/*
 #include "AppUpdater.h"
 #include "Web.h"
 #include "ZipUtils/zip.h"
@@ -247,7 +248,7 @@ void AppUpdater::GenerateUserId() {
 	int c;
 	size_t index = 0;
 	while (c = id.c_str()[index++]) {
-		hashCode = ((hashCode << 5) + hashCode) + c; /* hash * 33 + c */
+		hashCode = ((hashCode << 5) + hashCode) + c; // hash * 33 + c 
 	}
 
 	//Convert hash number to alphanumerical hash (base62)
@@ -709,4 +710,4 @@ void UpdateLogWindow::ProcessMessage(GLComponent *src, int message) {
 		break;
 	}
 	GLWindow::ProcessMessage(src, message);
-}
+}*/

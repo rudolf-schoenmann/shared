@@ -21,7 +21,7 @@ Full license text: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
 #include <direct.h> //_getcwd()
 #include <io.h> // Check for recovery
 #include <filesystem>
-#include "AppUpdater.h"
+//#include "AppUpdater.h"
 
 #include "GLApp/GLFileBox.h"
 #include "GLApp/GLMessageBox.h"
@@ -99,7 +99,7 @@ Interface::Interface() {
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo(&sysinfo);
 	numCPU = (size_t)sysinfo.dwNumberOfProcessors;
-	appUpdater = NULL; //We'll initialize later, when the app name and version id is known
+	//appUpdater = NULL; //We'll initialize later, when the app name and version id is known
 
 	antiAliasing = true;
 	whiteBg = false;
@@ -714,9 +714,9 @@ void Interface::SetFacetSearchPrg(bool visible, char *text) {
 
 int Interface::OnExit() {
 	SaveConfig();
-	if (appUpdater) {
+	/*if (appUpdater) {
 		appUpdater->IncreaseSessionCount();
-	}
+	}*/
 	remove(autosaveFilename.c_str());
 	//empty TMP directory
 	char tmp[1024];
@@ -1059,14 +1059,14 @@ void Interface::OneTimeSceneInit_shared_post() {
 	}
 
 	EmptyGeometry();
-
+	/*
 	appUpdater = new AppUpdater(appName, appVersionId, "updater_config.xml");
 	int answer = appUpdater->RequestUpdateCheck();
 	if (answer == ANSWER_ASKNOW) {
 		updateCheckDialog = new UpdateCheckDialog(appName, appUpdater);
 		updateCheckDialog->SetVisible(true);
 		wereEvents = true;
-	}
+	}*/
 }
 
 int Interface::RestoreDeviceObjects_shared() {
@@ -1101,9 +1101,9 @@ int Interface::RestoreDeviceObjects_shared() {
 	RVALIDATE_DLG(vertexCoordinates);
 	RVALIDATE_DLG(particleLogger);
 
-	RVALIDATE_DLG(updateCheckDialog);
-	RVALIDATE_DLG(updateFoundDialog);
-	RVALIDATE_DLG(updateLogWindow);
+	//RVALIDATE_DLG(updateCheckDialog);
+	//RVALIDATE_DLG(updateFoundDialog);
+	//RVALIDATE_DLG(updateLogWindow);
 
 	UpdateTitle();
 
@@ -1142,9 +1142,9 @@ int Interface::InvalidateDeviceObjects_shared() {
 	IVALIDATE_DLG(vertexCoordinates);
 	IVALIDATE_DLG(particleLogger);
 
-	IVALIDATE_DLG(updateCheckDialog);
-	IVALIDATE_DLG(updateFoundDialog);
-	IVALIDATE_DLG(updateLogWindow);
+	//IVALIDATE_DLG(updateCheckDialog);
+	//IVALIDATE_DLG(updateFoundDialog);
+	//IVALIDATE_DLG(updateLogWindow);
 
 	UpdateTitle();
 
@@ -2845,7 +2845,7 @@ int Interface::FrameMove()
 	if (timeForAutoSave) AutoSave();
 
 	//Check if app updater has found updates
-	if (appUpdater && appUpdater->IsUpdateAvailable()) {
+	/*if (appUpdater && appUpdater->IsUpdateAvailable()) {
 		if (!updateLogWindow) {
 			updateLogWindow = new UpdateLogWindow(this);
 		}
@@ -2854,7 +2854,7 @@ int Interface::FrameMove()
 			updateFoundDialog->SetVisible(true);
 			wereEvents = true;
 		}
-	}
+	}*/
 
 	if (worker.globalHitCache.nbLeakTotal) {
 		sprintf(tmp, "%g (%.4f%%)", (double)worker.globalHitCache.nbLeakTotal, (double)(worker.globalHitCache.nbLeakTotal)*100.0 / (double)worker.globalHitCache.globalHits.hit.nbDesorbed);

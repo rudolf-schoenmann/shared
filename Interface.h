@@ -102,6 +102,7 @@ typedef struct {
 
 #define MENU_FILE_LOADRECENT 120
 #define MENU_FILE_IMPORTBUFFER_HIT 130
+#define MENU_FILE_IMPORTBUFFER_LOAD 131
 #define MENU_FILE_EXIT       106
 
 #define MENU_EDIT_TSCALING     201
@@ -238,6 +239,7 @@ protected:
 	virtual void InsertGeometry(bool newStr, char *fName = NULL) {}
 	virtual void SaveFile() {}
 	virtual void ImportHitBuffer(char *fName = NULL) {}
+	virtual void ImportLoadBuffer(char *fName = NULL) {}
 	int FrameMove();
 
 public:

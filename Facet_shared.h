@@ -63,6 +63,7 @@ public:
 
 	// Constructor/Desctructor/Initialisation
 	Facet(size_t nbIndex);
+	Facet();
 	~Facet();
 
 	void  DetectOrientation();

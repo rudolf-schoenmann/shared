@@ -1179,6 +1179,13 @@ bool Interface::ProcessMessage_shared(GLComponent *src, int message) {
 				ImportHitBuffer();
 			}
 			return true;
+		case MENU_FILE_IMPORTBUFFER_LOAD:
+			if (AskToSave()) {
+				if (worker.isRunning) worker.Stop_Public();
+				ImportLoadBuffer();
+				int test = 0;
+			}
+			return true;
 		case MENU_FILE_INSERTGEO:
 			if (geom->IsLoaded()) {
 				if (worker.isRunning) worker.Stop_Public();

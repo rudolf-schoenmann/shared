@@ -162,6 +162,120 @@ Facet::Facet(size_t nbIndex) {
 #endif
 }
 
+Facet::Facet() {
+
+	memset(&facetHitCache, 0, sizeof(FacetHitBuffer));
+
+
+	sh.sticking = 0.0;
+	sh.opacity = 1.0;
+
+	sh.profileType = PROFILE_NONE;
+
+	sh.texWidth = 0;
+	sh.texHeight = 0;
+	sh.texWidthD = 0.0;
+	sh.texHeightD = 0.0;
+	sh.center.x = 0.0;
+	sh.center.y = 0.0;
+	sh.center.z = 0.0;
+
+	sh.is2sided = false;
+	sh.isProfile = false;
+	//wp.isOpaque = true;
+	sh.isTextured = false;
+	sh.sign = 0.0;
+	sh.countAbs = false;
+	sh.countRefl = false;
+	sh.countTrans = false;
+	sh.countDirection = false;
+
+	sh.superIdx = 0;
+	sh.superDest = 0;
+	sh.teleportDest = 0;
+	sh.isVolatile = false;
+
+	textureVisible = true;
+	volumeVisible = true;
+
+	texDimW = 0;
+	texDimH = 0;
+	tRatio = 0.0;
+
+	//mesh = NULL;
+	//meshPts = NULL;
+	cellPropertiesIds = NULL;
+	meshvector = NULL;
+	meshvectorsize = 0;
+	hasMesh = false;
+	//nbElem = 0;
+	selectedElem.u = 0;
+	selectedElem.v = 0;
+	selectedElem.width = 0;
+	selectedElem.height = 0;
+	dirCache = NULL;
+	textureError = false;
+
+	glTex = 0;
+	glList = 0;
+	glElem = 0;
+	glSelElem = 0;
+	selected = false;
+
+#ifdef MOLFLOW
+	angleMapCache = NULL;
+
+	sh.temperature = 293.15; // 20degC
+	sh.outgassing = 0.0;           // 1 unit*l/s //will be outgasssing
+	sh.desorbType = DES_NONE;
+	sh.desorbTypeN = 0.0;
+
+	sh.reflection.diffusePart = 1.0; //totally diffuse reflection
+	sh.reflection.specularPart = 0.0;
+	sh.reflection.cosineExponent = 0.0; //Cos^0 = uniform
+
+	sh.countDes = false;
+	sh.countACD = false;
+	sh.useOutgassingFile = false;
+	sh.accomodationFactor = 1.0;
+
+	sh.enableSojournTime = false;
+	sh.sojournFreq = 1E13;
+	sh.sojournE = 100;
+
+	sh.outgassing_paramId = -1;
+	sh.opacity_paramId = -1;
+	sh.sticking_paramId = -1;
+
+	sh.isMoving = false;
+
+	hasOutgassingFile = false;
+	outgassingMap = NULL;
+
+	sh.anglemapParams.record = false;
+	sh.anglemapParams.hasRecorded = false;
+	sh.anglemapParams.phiWidth = sh.anglemapParams.thetaLowerRes = sh.anglemapParams.thetaHigherRes = 0;
+	sh.anglemapParams.thetaLimit = 1.570796326; //slightly lower than PI/2
+
+	//sh.facetHistogramParams.record = false;
+
+	totalFlux = sh.totalOutgassing = totalDose = 0.0;
+
+	userOutgassing = "";
+	userOpacity = "";
+	userSticking = "";
+#endif
+
+#ifdef SYNRAD
+	sh.doScattering = false;
+	sh.rmsRoughness = 100.0E-9; //100nm
+	sh.autoCorrLength = 100 * 100E-9; //tau=autoCorr/RMS=100
+
+	sh.reflectType = REFLECTION_SPECULAR;
+	sh.recordSpectrum = false;
+#endif
+}
+
 Facet::~Facet() {
 	  SAFE_FREE(cellPropertiesIds);
 	  SAFE_FREE(dirCache);

@@ -43,6 +43,8 @@ public:
   // Component methods
   void SetWorker(Worker *w);
   void SetSize(size_t nbColumn,size_t nbRow,bool keepData=false,bool showProgress=false);
+  void SetColumnLabel(int col, int num);
+  char* getColumnLabel(int col);
   void SetColumnLabels(char **names);
   void SetColumnLabels();
   void SetColumnLabel(size_t colId,char *name);

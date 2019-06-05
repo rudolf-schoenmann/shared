@@ -429,6 +429,20 @@ void GLList::SetColumnLabels() {
 	}
 }
 
+void GLList::SetColumnLabel(int col, int num) {
+	if (cNames) {
+		SAFE_FREE(cNames[col]);
+		char c = num + '0';
+		cNames[col] = _strdup(&c);
+	}
+}
+
+char* GLList::getColumnLabel(int col) {
+	if (cNames) {
+		return cNames[col];
+	}
+}
+
 void GLList::SetRowLabels(char **names) {
 
 	if(rNames) {

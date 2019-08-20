@@ -1,9 +1,9 @@
 /*
-Program:     MolFlow+ / Synrad+
-Description: Monte Carlo simulator for ultra-high vacuum and synchrotron radiation
-Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
-Copyright:   E.S.R.F / CERN
-Website:     https://cern.ch/molflow
+Program:     ContaminationFlow
+Description: Monte Carlo simulator for satellite contanimation studies
+Authors:     Rudolf Schönmann / Hoai My Van
+Copyright:   TU Munich
+Forked from: Molflow (CERN) (https://cern.ch/molflow)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -93,6 +93,8 @@ extern std::string appTitle;
 extern std::string appName;
 extern std::string appVersionName;
 extern int appVersionId;
+
+extern int offset_width;
 
 Interface::Interface() {
 	//Get number of cores
@@ -535,8 +537,8 @@ void Interface::AnimateViewerChange(int next) {
 
 	double xs1, ys1, xs2, ys2;
 	double xe1, ye1, xe2, ye2;
-	int sx = m_screenWidth - 205;
-	int fWidth = m_screenWidth - 215;
+	int sx = m_screenWidth - 205-offset_width;
+	int fWidth = m_screenWidth - 215- offset_width;
 	int fHeight = m_screenHeight - 27;
 	int Width2 = fWidth / 2 - 1;
 	int Height2 = fHeight / 2 - 1;
@@ -670,10 +672,10 @@ void Interface::SelectViewer(int s) {
 
 void Interface::Place3DViewer() {
 
-	int sx = m_screenWidth - 205;
+	int sx = m_screenWidth - 205-offset_width;
 
 	// 3D Viewer ----------------------------------------------
-	int fWidth = m_screenWidth - 215;
+	int fWidth = m_screenWidth - 215- offset_width;
 	int fHeight = m_screenHeight - 27;
 	int Width2 = fWidth / 2 - 1;
 	int Height2 = fHeight / 2 - 1;
@@ -1183,7 +1185,6 @@ bool Interface::ProcessMessage_shared(GLComponent *src, int message) {
 			if (AskToSave()) {
 				if (worker.isRunning) worker.Stop_Public();
 				ImportLoadBuffer();
-				int test = 0;
 			}
 			return true;
 		case MENU_FILE_INSERTGEO:
@@ -1772,9 +1773,9 @@ bool Interface::ProcessMessage_shared(GLComponent *src, int message) {
 			std::ostringstream aboutText;
 			aboutText << "Program:    " << appName << " " << appVersionName;
 			aboutText << R"(
-Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY
-Copyright:   E.S.R.F / CERN   (2018)
-Website:    https://cern.ch/molflow
+Authors:     Jean-Luc PONS / Roberto KERSEVAN / Marton ADY / Rudolf Schönmann / Hoai My VAN
+Copyright:   TU Munich
+Forked from: Molflow (CERN) (https://cern.ch/molflow).
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

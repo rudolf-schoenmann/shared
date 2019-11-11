@@ -55,6 +55,10 @@ Facet::Facet(size_t nbIndex) {
 
 	sh.sticking = 0.0;
 	sh.opacity = 1.0;
+	sh.effectiveSurfaceFactor = 1.0;
+	sh.facetDepth = 1.0;
+	sh.diffusionCoefficient = 1E-3; //TODO currently random value
+	sh.concentration = 1E-3; //TODO curently random value
 
 	sh.profileType = PROFILE_NONE;
 	
@@ -169,6 +173,10 @@ Facet::Facet() {
 
 	sh.sticking = 0.0;
 	sh.opacity = 1.0;
+	sh.effectiveSurfaceFactor = 1.0;
+	sh.facetDepth = 1.0;
+	sh.diffusionCoefficient = 1E-3; //TODO currently random value
+	sh.concentration = 1E-3; //TODO curently random value
 
 	sh.profileType = PROFILE_NONE;
 

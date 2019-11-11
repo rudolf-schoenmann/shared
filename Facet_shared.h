@@ -189,6 +189,10 @@ public:
 	std::string usercoverage;
 	std::string usercovering;
 	std::string userdesorption;
+	std::string userSurfacefactor;
+	std::string userDepth;
+	std::string userDiffusion;
+	std::string userConcentration;
 #endif
 
 #ifdef SYNRAD

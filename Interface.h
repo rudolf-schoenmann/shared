@@ -330,6 +330,19 @@ public:
 	GLLabel       *facetAreaLabel;
 	GLTextField   *facetArea;
 
+	GLLabel       *facetSurfaceFactorLabel;
+	GLTextField   *facetSurfaceFactor;
+	GLLabel       *facetDepthLabel;
+	GLTextField   *facetDepth;
+	GLLabel       *facetVolumeLabel;
+	GLTextField   *facetVolume;
+	GLLabel       *facetDiffusionLabel;
+	GLTextField   *facetDiffusion;
+	GLLabel       *facetConcentrationLabel;
+	GLTextField   *facetConcentration;
+	GLLabel       *facetMassLabel;
+	GLTextField   *facetMass;
+
 	GLToggle      *autoFrameMoveToggle;
 	GLButton      *forceFrameMoveButton;
 

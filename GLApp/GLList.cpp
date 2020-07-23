@@ -423,9 +423,25 @@ void GLList::SetColumnLabels() {
 		cNames[0]= _strdup("time");
 		for (int i = 1;i < nbCol;i++) {
 			SAFE_FREE(cNames[i]);
-			char c= i + '0';
-			cNames[i] = _strdup(&c);
+			std::string s = std::to_string(i);
+			char const *c = s.c_str();
+			cNames[i] = _strdup(c);
 		}
+	}
+}
+
+void GLList::SetColumnLabel(int col, int num) {
+	if (cNames) {
+		SAFE_FREE(cNames[col]);
+		std::string s = std::to_string(num);
+		char const *c = s.c_str();
+		cNames[col] = _strdup(c);
+	}
+}
+
+char* GLList::getColumnLabel(int col) {
+	if (cNames) {
+		return cNames[col];
 	}
 }
 

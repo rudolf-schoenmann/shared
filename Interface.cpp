@@ -1024,10 +1024,40 @@ void Interface::OneTimeSceneInit_shared_pre() {
 	facetOpacity = new GLTextField(0, NULL);
 	facetPanel->Add(facetOpacity);
 
+	facetDiffusionLabel = new GLLabel("Diffusion Coeff. (m\262/s):");
+	facetPanel->Add(facetDiffusionLabel);
+	facetDiffusion = new GLTextField(0, NULL);
+	facetPanel->Add(facetDiffusion);
+
+	facetConcentrationLabel = new GLLabel("Concentration (kg/cm\263):");
+	facetPanel->Add(facetConcentrationLabel);
+	facetConcentration = new GLTextField(0, NULL);
+	facetPanel->Add(facetConcentration);
+
+	facetMassLabel = new GLLabel("Mass (kg):");
+	facetPanel->Add(facetMassLabel);
+	facetMass = new GLTextField(0, NULL);
+	facetPanel->Add(facetMass);
+
+	facetDepthLabel = new GLLabel("Facet Depth (cm):");
+	facetPanel->Add(facetDepthLabel);
+	facetDepth = new GLTextField(0, NULL);
+	facetPanel->Add(facetDepth);
+
+	facetVolumeLabel = new GLLabel("Facet Volume (cm\263):");
+	facetPanel->Add(facetVolumeLabel);
+	facetVolume = new GLTextField(0, NULL);
+	facetPanel->Add(facetVolume);
+
 	facetAreaLabel = new GLLabel("Area (cm\262):");
 	facetPanel->Add(facetAreaLabel);
 	facetArea = new GLTextField(0, NULL);
 	facetPanel->Add(facetArea);
+
+	facetSurfaceFactorLabel = new GLLabel("Eff. Surface Factor:");
+	facetPanel->Add(facetSurfaceFactorLabel);
+	facetSurfaceFactor = new GLTextField(0, NULL);
+	facetPanel->Add(facetSurfaceFactor);
 
 	facetDetailsBtn = new GLButton(0, "Details...");
 	facetPanel->Add(facetDetailsBtn);

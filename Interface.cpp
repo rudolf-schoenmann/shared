@@ -95,7 +95,6 @@ extern std::string appName;
 extern std::string appVersionName;
 extern int appVersionId;
 
-extern int offset_width;
 
 Interface::Interface() {
 	//Get number of cores
@@ -538,8 +537,8 @@ void Interface::AnimateViewerChange(int next) {
 
 	double xs1, ys1, xs2, ys2;
 	double xe1, ye1, xe2, ye2;
-	int sx = m_screenWidth - 205-offset_width;
-	int fWidth = m_screenWidth - 215- offset_width;
+	int sx = m_screenWidth - 205;
+	int fWidth = m_screenWidth - 215;
 	int fHeight = m_screenHeight - 27;
 	int Width2 = fWidth / 2 - 1;
 	int Height2 = fHeight / 2 - 1;
@@ -673,10 +672,10 @@ void Interface::SelectViewer(int s) {
 
 void Interface::Place3DViewer() {
 
-	int sx = m_screenWidth - 205-offset_width;
+	int sx = m_screenWidth - 205;
 
 	// 3D Viewer ----------------------------------------------
-	int fWidth = m_screenWidth - 215- offset_width;
+	int fWidth = m_screenWidth - 215;
 	int fHeight = m_screenHeight - 27;
 	int Width2 = fWidth / 2 - 1;
 	int Height2 = fHeight / 2 - 1;
